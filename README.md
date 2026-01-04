@@ -8,8 +8,8 @@ Official PyTorch implementation of the paper **"PDF: Prompt-guided Decoupled Fea
 ### Environment Setup
 ```bash
 # Create a conda environment
-conda create -n pdf_final python=3.9 -y
-conda activate pdf_final
+conda create -n pdf python=3.9 -y
+conda activate pdf
 
 # Install PyTorch and dependencies
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113 "numpy<2.0"
