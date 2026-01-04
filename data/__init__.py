@@ -3,9 +3,7 @@ import data.spatial_transforms as ST
 import data.temporal_transforms as TT
 from torch.utils.data import DataLoader
 from data.dataloader import DataLoaderX
-from data.dataset_loader import ImageDataset, VideoDataset, ImageDatasetClipPRCCTrain, ImageDatasetClipTestPRCC, \
-    ImageDatasetClipLTCC, ImageDatasetClipLTCCTest, ImageDatasetClipVCTrain, \
-    ImageDatasetClipVCTest, ImageDatasetLastTrain, ImageDatasetLastTest, VideoDatasetCLIPTrain, VideoDatasetCLIPTest
+from data.dataset_loader import ImageDataset, ImageDatasetClipPRCCTrain, ImageDatasetClipLTCC, ImageDatasetClipVCTrain, ImageDatasetLastTrain
 from data.samplers import DistributedRandomIdentitySampler, DistributedInferenceSampler
 from data.datasets.ltcc import LTCC
 from data.datasets.prcc import PRCC
@@ -102,114 +100,75 @@ def build_vid_transforms(config):
 
 def build_dataloader(config):
     dataset = build_dataset(config)
-    # video dataset
-    if config.DATA.DATASET in VID_DATASET:
-        spatial_transform_train, spatial_transform_test, temporal_transform_train, temporal_transform_test = build_vid_transforms(config)
 
-        if config.DATA.DENSE_SAMPLING:
-            train_sampler = DistributedRandomIdentitySampler(dataset.train_dense, 
-                                                             num_instances=config.DATA.NUM_INSTANCES, 
-                                                             seed=config.SEED)
-            # split each original training video into a series of short videos and sample one clip for each short video during training
-            trainloader = DataLoaderX(
-                dataset=VideoDatasetCLIPTrain(dataset.train_dense, spatial_transform_train, temporal_transform_train),
-                sampler=train_sampler,
-                batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                pin_memory=True, drop_last=True)
-        else:
-            train_sampler = DistributedRandomIdentitySampler(dataset.train, 
-                                                             num_instances=config.DATA.NUM_INSTANCES, 
-                                                             seed=config.SEED)
-            # sample one clip for each original training video during training
-            trainloader = DataLoaderX(
-                dataset=VideoDataset(dataset.train, spatial_transform_train, temporal_transform_train),
-                sampler=train_sampler,
-                batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                pin_memory=True, drop_last=True)
-        
-        # split each original test video into a series of clips and use the averaged feature of all clips as its representation
-        queryloader = DataLoaderX(
-            dataset=VideoDatasetCLIPTest(dataset.recombined_query, spatial_transform_test, temporal_transform_test),
-            sampler=DistributedInferenceSampler(dataset.recombined_query),
-            batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-            pin_memory=True, drop_last=False, shuffle=False)
-        galleryloader = DataLoaderX(
-            dataset=VideoDataset(dataset.recombined_gallery, spatial_transform_test, temporal_transform_test),
-            sampler=DistributedInferenceSampler(dataset.recombined_gallery),
-            batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-            pin_memory=True, drop_last=False, shuffle=False)
+    transform_train, transform_test = build_img_transforms(config)
+    train_sampler = DistributedRandomIdentitySampler(dataset.train, 
+                                                        num_instances=config.DATA.NUM_INSTANCES, 
+                                                        seed=config.SEED)
+
+    trainloader = DataLoaderX(dataset=ImageDataset(dataset.train, transform=transform_train),
+                                sampler=train_sampler,
+                                batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                pin_memory=True, drop_last=True)
+
+    galleryloader = DataLoaderX(dataset=ImageDataset(dataset.gallery, transform=transform_test),
+                                sampler=DistributedInferenceSampler(dataset.gallery),
+                                batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                pin_memory=True, drop_last=False, shuffle=False)
+
+    if config.DATA.DATASET == 'prcc':
+        trainloader_clip = DataLoaderX(dataset=ImageDatasetClipPRCCTrain(dataset.train, transform=transform_train),
+                                        sampler=train_sampler,
+                                        batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                        pin_memory=True, drop_last=True)
+        queryloader_same = DataLoaderX(dataset=ImageDataset(dataset.query_same, transform=transform_test),
+                                    sampler=DistributedInferenceSampler(dataset.query_same),
+                                    batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                    pin_memory=True, drop_last=False, shuffle=False)
+        queryloader_diff = DataLoaderX(dataset=ImageDataset(dataset.query_diff, transform=transform_test),
+                                    sampler=DistributedInferenceSampler(dataset.query_diff),
+                                    batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                    pin_memory=True, drop_last=False, shuffle=False)
+        return trainloader_clip, queryloader_same, queryloader_diff, galleryloader, dataset, train_sampler
+    if config.DATA.DATASET == 'ltcc':
+        trainloader_clip = DataLoaderX(dataset=ImageDatasetClipLTCC(dataset.train, transform=transform_train),
+                                        sampler=train_sampler,
+                                        batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                        pin_memory=True, drop_last=True)
+        queryloader = DataLoaderX(dataset=ImageDataset(dataset.query, transform=transform_test),
+                                    sampler=DistributedInferenceSampler(dataset.query),
+                                    batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                    pin_memory=True, drop_last=False, shuffle=False)
+        return trainloader_clip, queryloader, galleryloader, dataset, train_sampler
+    if config.DATA.DATASET in ['vcclothes_cc', 'vcclothes_sc', 'vcclothes']:
+        print('#############Loading Vcclothes################')
+        trainloader_clip = DataLoaderX(dataset=ImageDatasetClipVCTrain(dataset.train, transform=transform_train),
+                                        sampler=train_sampler,
+                                        batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                        pin_memory=True, drop_last=True)
+        queryloader = DataLoaderX(dataset=ImageDataset(dataset.query, transform=transform_test),
+                                    sampler=DistributedInferenceSampler(dataset.query),
+                                    batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                    pin_memory=True, drop_last=False, shuffle=False)
+        return trainloader_clip, queryloader, galleryloader, dataset, train_sampler
+
+    if config.DATA.DATASET == 'last':
+        print('#############Loading Last################')
+        trainloader_clip = DataLoaderX(dataset=ImageDatasetLastTrain(dataset.train, transform=transform_train),
+                                        sampler=train_sampler,
+                                        batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                        pin_memory=True, drop_last=True)
+        queryloader = DataLoaderX(dataset=ImageDataset(dataset.query, transform=transform_test),
+                                    sampler=DistributedInferenceSampler(dataset.query),
+                                    batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                    pin_memory=True, drop_last=False, shuffle=False)
+        return trainloader_clip, queryloader, galleryloader, dataset, train_sampler
+
+    else:
+        queryloader = DataLoaderX(dataset=ImageDataset(dataset.query, transform=transform_test),
+                                    sampler=DistributedInferenceSampler(dataset.query),
+                                    batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
+                                    pin_memory=True, drop_last=False, shuffle=False)
 
         return trainloader, queryloader, galleryloader, dataset, train_sampler
-    # image dataset
-    else:
-        transform_train, transform_test = build_img_transforms(config)
-        train_sampler = DistributedRandomIdentitySampler(dataset.train, 
-                                                         num_instances=config.DATA.NUM_INSTANCES, 
-                                                         seed=config.SEED)
-
-        trainloader = DataLoaderX(dataset=ImageDataset(dataset.train, transform=transform_train),
-                                 sampler=train_sampler,
-                                 batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                 pin_memory=True, drop_last=True)
-
-        galleryloader = DataLoaderX(dataset=ImageDataset(dataset.gallery, transform=transform_test),
-                                   sampler=DistributedInferenceSampler(dataset.gallery),
-                                   batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                   pin_memory=True, drop_last=False, shuffle=False)
-
-        if config.DATA.DATASET == 'prcc':
-            trainloader_clip = DataLoaderX(dataset=ImageDatasetClipPRCCTrain(dataset.train, transform=transform_train),
-                                           sampler=train_sampler,
-                                           batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                           pin_memory=True, drop_last=True)
-            queryloader_same = DataLoaderX(dataset=ImageDataset(dataset.query_same, transform=transform_test),
-                                     sampler=DistributedInferenceSampler(dataset.query_same),
-                                     batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                     pin_memory=True, drop_last=False, shuffle=False)
-            queryloader_diff = DataLoaderX(dataset=ImageDatasetClipTestPRCC(dataset.query_diff, transform=transform_test),
-                                     sampler=DistributedInferenceSampler(dataset.query_diff),
-                                     batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                     pin_memory=True, drop_last=False, shuffle=False)
-            return trainloader_clip, queryloader_same, queryloader_diff, galleryloader, dataset, train_sampler
-        if config.DATA.DATASET == 'ltcc':
-            trainloader_clip = DataLoaderX(dataset=ImageDatasetClipLTCC(dataset.train, transform=transform_train),
-                                           sampler=train_sampler,
-                                           batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                           pin_memory=True, drop_last=True)
-            queryloader = DataLoaderX(dataset=ImageDatasetClipLTCCTest(dataset.query, transform=transform_test),
-                                      sampler=DistributedInferenceSampler(dataset.query),
-                                      batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                      pin_memory=True, drop_last=False, shuffle=False)
-            return trainloader_clip, queryloader, galleryloader, dataset, train_sampler
-        if config.DATA.DATASET in ['vcclothes_cc', 'vcclothes_sc', 'vcclothes']:
-            print('#############Loading Vcclothes################')
-            trainloader_clip = DataLoaderX(dataset=ImageDatasetClipVCTrain(dataset.train, transform=transform_train),
-                                           sampler=train_sampler,
-                                           batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                           pin_memory=True, drop_last=True)
-            queryloader = DataLoaderX(dataset=ImageDatasetClipVCTest(dataset.query, transform=transform_test),
-                                      sampler=DistributedInferenceSampler(dataset.query),
-                                      batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                      pin_memory=True, drop_last=False, shuffle=False)
-            return trainloader_clip, queryloader, galleryloader, dataset, train_sampler
-
-        if config.DATA.DATASET == 'last':
-            print('#############Loading Last################')
-            trainloader_clip = DataLoaderX(dataset=ImageDatasetLastTrain(dataset.train, transform=transform_train),
-                                           sampler=train_sampler,
-                                           batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                           pin_memory=True, drop_last=True)
-            queryloader = DataLoaderX(dataset=ImageDatasetLastTest(dataset.query, transform=transform_test),
-                                      sampler=DistributedInferenceSampler(dataset.query),
-                                      batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                      pin_memory=True, drop_last=False, shuffle=False)
-            return trainloader_clip, queryloader, galleryloader, dataset, train_sampler
-
-        else:
-            queryloader = DataLoaderX(dataset=ImageDataset(dataset.query, transform=transform_test),
-                                     sampler=DistributedInferenceSampler(dataset.query),
-                                     batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                     pin_memory=True, drop_last=False, shuffle=False)
-
-            return trainloader, queryloader, galleryloader, dataset, train_sampler
 
