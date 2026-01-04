@@ -4,21 +4,16 @@ Official PyTorch implementation of the paper **"PDF: Prompt-guided Decoupled Fea
 
 ## 1. Installation
 
-### Requirements
-*   Python 3.8
-*   PyTorch 1.8.0
-*   torchvision 0.9.0
-*   CUDA 10.2 or higher
 
 ### Environment Setup
 ```bash
 # Create a conda environment
-conda create -n pdf_reid python=3.8
-conda activate pdf_reid
+conda create -n pdf_final python=3.9 -y
+conda activate pdf_final
 
 # Install PyTorch and dependencies
-conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=10.2 -c pytorch
-pip install yacs timm scikit-image tqdm ftfy regex matplotlib
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113 "numpy<2.0"
+pip install yacs timm==0.5.4 scikit-image tqdm ftfy regex matplotlib h5py
 ```
 
 ## 2. Prepare Datasets
