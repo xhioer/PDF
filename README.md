@@ -57,19 +57,6 @@ sh train.sh
 
 *You can modify `train.sh` to switch between different datasets or hyper-parameters by changing the `--config_file` argument.*
 
-## 4. Evaluation
-
-To evaluate a trained model, use the `test.sh` script. Ensure you have the checkpoint file path correctly set in the script or config file.
-
-```bash
-# Run evaluation
-sh test.sh
-```
-
-For manual testing of a specific weight:
-```bash
-CUDA_VISIBLE_DEVICES=0 python test.py --config_file configs/ltcc.yml TEST.WEIGHT 'logs/ltcc/ViT-B-16_60.pth'
-```
 
 
 ## Acknowledgement
