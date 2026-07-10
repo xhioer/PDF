@@ -83,8 +83,7 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
         images_in_batch = imgs.size(0)
         optimizer.zero_grad()
         reference_images = imgs.cuda()
-        pos_mask = pid2clothes[pids]
-        imgs, pids, clothes_ids, pos_mask = imgs.cuda(), pids.cuda(), clothes_ids.cuda(), pos_mask.float().cuda()
+        imgs, pids, clothes_ids = imgs.cuda(), pids.cuda(), clothes_ids.cuda()
         text_inputs = tokenize(cap, tokenizer, context_length=77, truncate=True).cuda()
         with torch.cuda.amp.autocast():
             [cls_score, cls_score_proj], [img_feature, img_feature_proj], [com_proj, com_z, t_bn, t_z_bn] = clip_model(reference_images, text_inputs)
@@ -106,6 +105,19 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
+
+        if (batch_idx + 1) % 20 == 0 or (batch_idx + 1) == len(trainloader):
+            logger.info(
+                'Epoch{0} [{1}/{2}] '
+                'ClaLoss:{3:.4f} PairLoss:{4:.4f} OPLLoss:{5:.4f}'.format(
+                    epoch + 1,
+                    batch_idx + 1,
+                    len(trainloader),
+                    batch_cla_loss.avg,
+                    batch_pair_loss.avg,
+                    batch_opl_loss.avg,
+                )
+            )
 
     logger.info('Epoch{0} '
                 'Time:{batch_time.sum:.1f}s '

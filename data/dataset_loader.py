@@ -5,7 +5,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 import json
 import pickle
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 base_path = Path(__file__).absolute().parents[1].absolute()
 import random
 from models.utils.simple_tokenizer import SimpleTokenizer
@@ -44,6 +44,38 @@ def tokenize(caption: str, tokenizer, text_length=77, truncate=True) -> torch.Lo
     return result
 
 
+def _relative_caption_key(img_path, dataset_dir):
+    parts = PurePosixPath(Path(img_path).as_posix()).parts
+    if dataset_dir not in parts:
+        return None
+    anchor = max(idx for idx, part in enumerate(parts) if part == dataset_dir)
+    suffix = parts[anchor + 1:]
+    return "/".join(("data", dataset_dir, *suffix))
+
+
+def get_caption(cap_train, img_path, dataset_dir):
+    normalized = Path(img_path).as_posix()
+    candidates = [normalized]
+
+    try:
+        repo_relative = Path(normalized).resolve().relative_to(base_path.resolve())
+        candidates.append(repo_relative.as_posix())
+    except Exception:
+        pass
+
+    remapped = _relative_caption_key(normalized, dataset_dir)
+    if remapped is not None:
+        candidates.append(remapped)
+
+    for key in candidates:
+        if key in cap_train:
+            return cap_train[key][0]
+
+    raise KeyError(
+        f"Caption not found for '{img_path}'. Tried keys: {candidates}"
+    )
+
+
 class ImageDatasetClipPRCCTrain(Dataset):
     """Image Person ReID Dataset"""
     def __init__(self, dataset, transform=None):
@@ -57,7 +89,7 @@ class ImageDatasetClipPRCCTrain(Dataset):
 
     def __getitem__(self, index):
         img_path, pid, camid, clothes_id = self.dataset[index]
-        caption = self.cap_train[img_path][0]
+        caption = get_caption(self.cap_train, img_path, 'prcc')
         img = read_image(img_path)
         if self.transform is not None:
             img = self.transform(img)
@@ -77,7 +109,7 @@ class ImageDatasetClipLTCC(Dataset):
 
     def __getitem__(self, index):
         img_path, pid, camid, clothes_id = self.dataset[index]
-        caption = self.cap_train[img_path][0]
+        caption = get_caption(self.cap_train, img_path, 'LTCC_ReID')
         img = read_image(img_path)
         if self.transform is not None:
             img = self.transform(img)
@@ -98,7 +130,7 @@ class ImageDatasetClipVCTrain(Dataset):
 
     def __getitem__(self, index):
         img_path, pid, camid, clothes_id = self.dataset[index]
-        caption = self.cap_train[img_path][0]
+        caption = get_caption(self.cap_train, img_path, 'VC-Clothes')
         img = read_image(img_path)
         if self.transform is not None:
             img = self.transform(img)
@@ -119,7 +151,7 @@ class ImageDatasetLastTrain(Dataset):
 
     def __getitem__(self, index):
         img_path, pid, camid, clothes_id = self.dataset[index]
-        caption = self.cap_train[img_path][0]
+        caption = get_caption(self.cap_train, img_path, 'last')
         img = read_image(img_path)
         if self.transform is not None:
             img = self.transform(img)

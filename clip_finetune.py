@@ -123,9 +123,9 @@ def main(config, model_folder):
         logger.info("Evaluate only")
         with torch.no_grad():
             if config.DATA.DATASET == 'prcc':
-                test_prcc_clip_combiner(clip_model, queryloader_same, queryloader_diff, galleryloader, dataset, combiner)
+                test_prcc_clip_combiner(clip_model, queryloader_same, queryloader_diff, galleryloader, dataset)
             else:
-                test_clip_combiner(config, clip_model, queryloader, galleryloader, dataset, combiner)
+                test_clip_combiner(config, clip_model, queryloader, galleryloader, dataset)
         return
 
     logger.info("==> Test")
@@ -188,13 +188,16 @@ def main(config, model_folder):
                 best_rank1 = rank1
                 best_epoch = epoch + 1
 
-                # if local_rank == 0:
-                #     # params1 = clip_model.state_dict()
-                #     save_checkpoint(
-                #         {
-                #         'model_state_dict': clip_model.module.state_dict(),
-                #         }
-                #         , is_best, osp.join(model_folder, 'model.pth'))
+                if local_rank == 0:
+                    save_checkpoint(
+                        {
+                            'model_state_dict': clip_model.module.state_dict(),
+                            'epoch': best_epoch,
+                            'rank1': best_rank1,
+                        },
+                        is_best,
+                        osp.join(model_folder, 'model.pth')
+                    )
 
         scheduler.step()
 
