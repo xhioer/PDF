@@ -774,6 +774,26 @@ class CLIP(nn.Module):
         self.bottleneck_proj.bias.requires_grad_(False)
         self.bottleneck_proj.apply(weights_init_kaiming)
 
+    def freeze_text_encoder(self):
+        """Freeze CLIP's original text encoder while keeping fusion layers trainable."""
+        for module in (self.token_embedding, self.transformer, self.ln_final):
+            module.requires_grad_(False)
+        self.positional_embedding.requires_grad_(False)
+        self.text_projection.requires_grad_(False)
+        self.text_encoder_frozen = True
+        self._set_text_encoder_eval()
+
+    def _set_text_encoder_eval(self):
+        if getattr(self, 'text_encoder_frozen', False):
+            self.token_embedding.eval()
+            self.transformer.eval()
+            self.ln_final.eval()
+
+    def train(self, mode=True):
+        super().train(mode)
+        self._set_text_encoder_eval()
+        return self
+
     def cross_former(self, q, k, v):
         q = q.permute(1, 0, 2)  # NLD -> LND
         q = self.cross_modal_transformer(q)

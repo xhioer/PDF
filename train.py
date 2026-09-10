@@ -10,7 +10,6 @@ import numpy as np
 import torch.nn.functional as F
 from torch import distributed as dist
 from tqdm import tqdm
-import random
 from models.utils.simple_tokenizer import SimpleTokenizer
 from typing import Any, Union, List
 from pkg_resources import packaging
@@ -89,8 +88,20 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
             [cls_score, cls_score_proj], [img_feature, img_feature_proj], [com_proj, com_z, t_bn, t_z_bn] = clip_model(reference_images, text_inputs)
             reference_features_proj = img_feature_proj
             cla_loss = criterion_cla(cls_score_proj, pids)
-            rn1 = random.gauss(0.5, 0.5)
-            cir_com_loss = criterion_pair(reference_features_proj-com_proj*rn1, reference_features_proj-com_proj*rn1, pids)
+            # Use two independent per-sample coefficients as in Eq. (10)-(11).
+            alpha = torch.randn(
+                reference_features_proj.size(0), 1,
+                device=reference_features_proj.device,
+                dtype=reference_features_proj.dtype,
+            ) * 0.5 + 0.5
+            alpha_pos = torch.randn(
+                reference_features_proj.size(0), 1,
+                device=reference_features_proj.device,
+                dtype=reference_features_proj.dtype,
+            ) * 0.5 + 0.5
+            ir_features = reference_features_proj - com_proj * alpha
+            ir_features_pos = reference_features_proj - com_proj * alpha_pos
+            cir_com_loss = criterion_pair(ir_features, ir_features_pos, pids)
             opl_loss = opl(reference_features_proj, com_proj, pids, clothes_ids)*0.5
             loss = cla_loss + cir_com_loss + opl_loss
 

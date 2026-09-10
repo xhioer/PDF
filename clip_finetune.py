@@ -89,17 +89,18 @@ def main(config, model_folder):
     print('Loading data from ', config.DATA.DATASET, num_class)
     clip_model, clip_cfg = build_CLIP_from_openai_pretrained(clip_model_name, (config.DATA.HEIGHT, config.DATA.WIDTH), 16, num_class)
     clip_model.eval().float()
+    clip_model.freeze_text_encoder()
     
     # Build identity classification loss, pairwise loss, clothes classificaiton loss, and adversarial loss.
     criterion_cla, criterion_pair, criterion_clothes, criterion_adv = build_losses(config, dataset.num_train_clothes)
 
-    transformer_params = list(map(id, clip_model.transformer.parameters()))
-    base_params = filter(lambda p: id(p) not in transformer_params, clip_model.parameters())
+    trainable_params = [param for param in clip_model.parameters() if param.requires_grad]
 
     print("Model size: {:.5f}M".format(sum(p.numel() for p in clip_model.visual.parameters())/1000000.0))
+    print("Trainable parameters: {:.5f}M".format(sum(p.numel() for p in trainable_params)/1000000.0))
 
     optimizer = optim.Adam([
-                               {'params': base_params},
+                               {'params': trainable_params},
                            ],
                            lr=config.TRAIN.OPTIMIZER.LR,
                            weight_decay=config.TRAIN.OPTIMIZER.WEIGHT_DECAY)
