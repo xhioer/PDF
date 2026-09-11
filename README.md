@@ -6,19 +6,18 @@ Official PyTorch implementation of the paper **"PDF: Prompt-guided Decoupled Fea
 
 
 ### Environment Setup
-```bash
-# Create a conda environment
-conda create -n pdf python=3.9 -y
-conda activate pdf
 
-# Install PyTorch and dependencies
-pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113 "numpy<2.0"
-pip install yacs timm==0.5.4 scikit-image tqdm ftfy regex matplotlib h5py
+The reproduction machine already provides the required environment at `/data/envs/PDF`. Use its Python executable directly; do not install or upgrade `torch` or `torchvision` for reproduction or ablation runs.
+
+```bash
+/data/envs/PDF/bin/python --version
 ```
 
 ## 2. Prepare Datasets
 
-Download the cloth-changing ReID datasets into 'data' folder. The directory structure should look like this:
+For the current PRCC reproduction, use the read-only dataset at `/data/datasets/PRCC/prcc`. The default training captions are `data/captions/prcc.json`; the caption file can be changed per run without editing the loader.
+
+The expected PRCC directory structure is:
 
 ```text
 PDF/
@@ -42,20 +41,31 @@ PDF/
         └── gallery/
 ```
 
-> **Note:** Please ensure the root path in your configuration files (`configs/*.yml`) points to your `data/` folder.
+> **Note:** The PRCC root passed to the training command is `/data/datasets/PRCC`, which contains the `prcc/` directory.
 
 ## 3. Training
 
-We provide a convenient shell script to start the training process. This script handles the prompt-guided learning and feature decoupling.
+The canonical `train.sh` runs the standard two-card PRCC experiment with PPU-ZW810E cards 0 and 1, global batch size 64, and writes all results to `/data/outputs/PDF`.
 
-To train the model on the specified dataset (e.g., LTCC), run:
+Run the standard experiment with:
 
 ```bash
-# Run training
-sh train.sh
+bash train.sh
 ```
 
-*You can modify `train.sh` to switch between different datasets or hyper-parameters by changing the `--config_file` argument.*
+For ablations, use a separate Git worktree and pass only an ablation config and tag:
+
+```bash
+PDF_CFG=configs/ablations/no_opl.yaml PDF_TAG=no_opl bash train.sh
+```
+
+To use another caption file, set `PDF_CAPTION_FILE`:
+
+```bash
+PDF_CAPTION_FILE=/data/captions/prcc_v2.json PDF_TAG=caption-v2 bash train.sh
+```
+
+See [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md) for the mandatory paths, runtime settings, isolation rules, preflight checks, and reporting requirements.
 
 
 

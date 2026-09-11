@@ -117,10 +117,15 @@ def build_dataloader(config):
                                 pin_memory=True, drop_last=False, shuffle=False)
 
     if config.DATA.DATASET == 'prcc':
-        trainloader_clip = DataLoaderX(dataset=ImageDatasetClipPRCCTrain(dataset.train, transform=transform_train),
-                                        sampler=train_sampler,
-                                        batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
-                                        pin_memory=True, drop_last=True)
+        trainloader_clip = DataLoaderX(
+            dataset=ImageDatasetClipPRCCTrain(
+                dataset.train,
+                transform=transform_train,
+                caption_path=config.DATA.CAPTION_PATH,
+            ),
+            sampler=train_sampler,
+            batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,
+            pin_memory=True, drop_last=True)
         queryloader_same = DataLoaderX(dataset=ImageDataset(dataset.query_same, transform=transform_test),
                                     sampler=DistributedInferenceSampler(dataset.query_same),
                                     batch_size=config.DATA.TEST_BATCH, num_workers=config.DATA.NUM_WORKERS,

@@ -45,6 +45,7 @@ def parse_option():
     parser.add_argument('--cfg', type=str, required=True, metavar="FILE", help='path to config file')
     # Datasets
     parser.add_argument('--root', type=str, help="your root path to data directory")
+    parser.add_argument('--caption', type=str, help="training caption JSON file")
     parser.add_argument('--dataset', type=str, default='prcc', help="ltcc, prcc, vcclothes, ccvid, last, deepchange")
     # Miscs
     parser.add_argument('--output', type=str, help="your output path to save model and logs")

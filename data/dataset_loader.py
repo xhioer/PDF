@@ -76,12 +76,17 @@ def get_caption(cap_train, img_path, dataset_dir):
     )
 
 
+def _resolve_caption_path(caption_path):
+    path = Path(caption_path)
+    return path if path.is_absolute() else base_path / path
+
+
 class ImageDatasetClipPRCCTrain(Dataset):
     """Image Person ReID Dataset"""
-    def __init__(self, dataset, transform=None):
+    def __init__(self, dataset, transform=None, caption_path='data/captions/prcc.json'):
         self.dataset = dataset
         self.transform = transform
-        with open(base_path / 'data' / 'captions' / f'prcc.json') as f:
+        with open(_resolve_caption_path(caption_path)) as f:
             self.cap_train = json.load(f)
 
     def __len__(self):

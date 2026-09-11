@@ -12,6 +12,8 @@ _C.DATA = CN()
 _C.DATA.ROOT = 'data'
 # Dataset for evaluation
 _C.DATA.DATASET = 'prcc'
+# Training caption file, relative to the project root unless absolute
+_C.DATA.CAPTION_PATH = 'data/captions/prcc.json'
 # Workers for dataloader
 _C.DATA.NUM_WORKERS = 4
 # Height of input image
@@ -135,6 +137,8 @@ def update_config(config, args):
     # merge from specific arguments
     if args.root:
         config.DATA.ROOT = args.root
+    if getattr(args, 'caption', None):
+        config.DATA.CAPTION_PATH = args.caption
     if args.output:
         config.OUTPUT = args.output
 
