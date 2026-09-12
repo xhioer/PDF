@@ -527,7 +527,7 @@ def extract_img_feature_clip_combiner_query_gallery(clip_model, dataloader_q, da
     return features, pids, camids, clothes_ids
 
 
-def test_prcc_clip_combiner(model, queryloader_same, queryloader_diff, galleryloader, dataset, query_mode='image'):
+def test_prcc_clip_combiner(model, queryloader_same, queryloader_diff, galleryloader, dataset, query_mode='image', return_metrics=False):
     logger = logging.getLogger('cir_reid.test')
     since = time.time()
     model.eval()
@@ -572,6 +572,7 @@ def test_prcc_clip_combiner(model, queryloader_same, queryloader_diff, gallerylo
 
     logger.info("Computing CMC and mAP for the same clothes setting")
     cmc, mAP = evaluate(distmat_same, qs_pids, g_pids, qs_camids, g_camids)
+    same_metrics = {**{'Rank-{}'.format(k): float(cmc[k - 1]) for k in (1, 5, 10, 20)}, 'mAP': float(mAP)}
     logger.info("Results ---------------------------------------------------")
     logger.info(
         'top1:{:.1%} top5:{:.1%} top10:{:.1%} top20:{:.1%} mAP:{:.1%}'.format(cmc[0], cmc[4], cmc[9], cmc[19], mAP))
@@ -579,6 +580,9 @@ def test_prcc_clip_combiner(model, queryloader_same, queryloader_diff, gallerylo
 
     logger.info("Computing CMC and mAP only for clothes changing")
     cmc, mAP = evaluate(distmat_diff, qd_pids, g_pids, qd_camids, g_camids)
+    if return_metrics:
+        return {'same': same_metrics,
+                'different': {**{'Rank-{}'.format(k): float(cmc[k - 1]) for k in (1, 5, 10, 20)}, 'mAP': float(mAP)}}
     logger.info("Results ---------------------------------------------------")
     logger.info(
         'top1:{:.1%} top5:{:.1%} top10:{:.1%} top20:{:.1%} mAP:{:.1%}'.format(cmc[0], cmc[4], cmc[9], cmc[19], mAP))

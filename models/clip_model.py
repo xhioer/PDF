@@ -1147,7 +1147,7 @@ class CLIP(nn.Module):
             x = self.visual(image.type(self.dtype))
             return x[:, 0, :].float(),x[:, 0, :].float()
 
-    def forward(self, image, text=None, text_noise=None):
+    def forward(self, image, text=None, text_noise=None, semantic_guidance=None):
         # image_features = self.encode_image(image)
         # text_features = self.encode_text(text)
         # return image_features, text_features
@@ -1217,6 +1217,12 @@ class CLIP(nn.Module):
 
                     t = self.encode_text_irra(text)
                     # t_bn = self.bottleneck_proj(t[torch.arange(t.shape[0]), text.argmax(dim=-1)])
+                    if semantic_guidance is not None:
+                        if semantic_guidance.shape != (t.shape[0], t.shape[-1]):
+                            raise ValueError('Expected [batch,512] identity semantic guidance')
+                        t = t.clone()
+                        rows = torch.arange(t.shape[0], device=t.device)
+                        t[rows, text.argmax(dim=-1)] += semantic_guidance.to(t.dtype)
                     com_proj = self.combine(x, t)
                     com_proj = com_proj[torch.arange(com_proj.shape[0]), text.argmax(dim=-1)]
                     com_proj = self.bottleneck_proj(com_proj)

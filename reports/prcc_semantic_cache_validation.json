@@ -1,0 +1,27 @@
+{
+  "train_images": 17896,
+  "semantic_records": 17896,
+  "matched_unique": 17896,
+  "missing": 0,
+  "duplicate": 0,
+  "train_duplicate": 0,
+  "extra": 0,
+  "invalid_schema": 0,
+  "invalid_json": 0,
+  "invalid_metadata": 0,
+  "missing_paths": [],
+  "extra_paths": [],
+  "errors": [],
+  "cache_path": "/data/projects/ccreid-semantic-consistency-exp0/outputs/exp1_full_prcc_mllm/qwen3vl32b_p2_17896images.jsonl",
+  "cache_sha256": "cd0aded0585c6af9f65451a7a05cb7a088601057600533fb2efd151d1275f20d",
+  "source_config_sha256": "c46da791a954be120ec0581157fef0b226f03a80f7f8f93f3b9dabeffdfe22c2",
+  "retained_fields": [
+    "description",
+    "raw_model_output",
+    "image_path",
+    "person_id"
+  ],
+  "mapping": "resolved full path, exact person directory, PRCC.train tuples",
+  "no_missing_value_imputation": true,
+  "passed": true
+}

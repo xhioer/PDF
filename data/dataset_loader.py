@@ -83,11 +83,32 @@ def _resolve_caption_path(caption_path):
 
 class ImageDatasetClipPRCCTrain(Dataset):
     """Image Person ReID Dataset"""
-    def __init__(self, dataset, transform=None, caption_path='data/captions/prcc.json'):
+    def __init__(self, dataset, transform=None, caption_path='data/captions/prcc.json',
+                 semantic_cache=None, reliability_mode='none'):
         self.dataset = dataset
         self.transform = transform
         with open(_resolve_caption_path(caption_path)) as f:
             self.cap_train = json.load(f)
+        self.semantic_records = None
+        self.reliability_mode = reliability_mode
+        if semantic_cache:
+            from data.semantic_reliability import ATTRIBUTES, MODES, reliability, validate_cache
+            records, self.semantic_validation = validate_cache(dataset, semantic_cache)
+            if not self.semantic_validation['passed']:
+                raise ValueError('Semantic cache validation failed: ' + str(self.semantic_validation))
+            self.semantic_records = [records[str(Path(row[0]).resolve())] for row in dataset]
+            self.attribute_vocabulary = sorted({(key, row['description'][key])
+                for row in self.semantic_records for key in ATTRIBUTES
+                if row['description'][key] != 'unknown'})
+            vocabulary = {item: index + 1 for index, item in enumerate(self.attribute_vocabulary)}
+            self.semantic_indices = torch.tensor([[0 if row['description'][key] == 'unknown'
+                else vocabulary[key, row['description'][key]] for key in ATTRIBUTES]
+                for row in self.semantic_records], dtype=torch.long)
+            self.reliability_by_mode = {mode: torch.tensor([
+                reliability(row['description'], mode) for row in self.semantic_records], dtype=torch.float32)
+                for mode in MODES}
+            if reliability_mode not in MODES:
+                raise ValueError('Invalid SEMANTIC_RELIABILITY_MODE')
 
     def __len__(self):
         return len(self.dataset)
@@ -95,6 +116,10 @@ class ImageDatasetClipPRCCTrain(Dataset):
     def __getitem__(self, index):
         img_path, pid, camid, clothes_id = self.dataset[index]
         caption = get_caption(self.cap_train, img_path, 'prcc')
+        if self.semantic_records is not None:
+            caption = {'caption': caption, 'semantic_indices': self.semantic_indices[index],
+                       'reliability': self.reliability_by_mode[self.reliability_mode][index],
+                       'dataset_index': index, 'image_path': img_path}
         img = read_image(img_path)
         if self.transform is not None:
             img = self.transform(img)

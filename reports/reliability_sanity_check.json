@@ -1,0 +1,438 @@
+{
+  "passed": true,
+  "actual_image_dataloader_batches": 100,
+  "sampled_images": 6400,
+  "unique_images": 6400,
+  "batch_size": 64,
+  "seed": 0,
+  "config_only_difference": "SEMANTIC_RELIABILITY_MODE",
+  "cache_sha256": "cd0aded0585c6af9f65451a7a05cb7a088601057600533fb2efd151d1275f20d",
+  "statistics": [
+    {
+      "mode": "none",
+      "attribute": "gender",
+      "mean": 1.0,
+      "std": 0.0,
+      "min": 1.0,
+      "max": 1.0,
+      "zero_rate": 0.0,
+      "unique_values": [
+        1.0
+      ]
+    },
+    {
+      "mode": "none",
+      "attribute": "hair_color",
+      "mean": 0.98734375,
+      "std": 0.11178581902878865,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.01265625,
+      "unique_values": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "mode": "none",
+      "attribute": "hair_length",
+      "mean": 0.99671875,
+      "std": 0.05718814036526575,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.00328125,
+      "unique_values": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "mode": "none",
+      "attribute": "body_build",
+      "mean": 1.0,
+      "std": 0.0,
+      "min": 1.0,
+      "max": 1.0,
+      "zero_rate": 0.0,
+      "unique_values": [
+        1.0
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "gender",
+      "mean": 0.9753000140190125,
+      "std": 0.0,
+      "min": 0.9753000140190125,
+      "max": 0.9753000140190125,
+      "zero_rate": 0.0,
+      "unique_values": [
+        0.97530001
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "hair_color",
+      "mean": 0.8812042803969234,
+      "std": 0.09976884161756104,
+      "min": 0.0,
+      "max": 0.8924999833106995,
+      "zero_rate": 0.01265625,
+      "unique_values": [
+        0.0,
+        0.89249998
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "hair_length",
+      "mean": 0.8425263781007379,
+      "std": 0.048341136125173774,
+      "min": 0.0,
+      "max": 0.845300018787384,
+      "zero_rate": 0.00328125,
+      "unique_values": [
+        0.0,
+        0.84530002
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "body_build",
+      "mean": 0.7731000185012817,
+      "std": 0.0,
+      "min": 0.7731000185012817,
+      "max": 0.7731000185012817,
+      "zero_rate": 0.0,
+      "unique_values": [
+        0.77310002
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "gender",
+      "mean": 0.900546875,
+      "std": 0.19958867309478098,
+      "min": 0.5,
+      "max": 1.0,
+      "zero_rate": 0.0,
+      "unique_values": [
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "hair_color",
+      "mean": 0.63921875,
+      "std": 0.26544658530191384,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.04046875,
+      "unique_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "hair_length",
+      "mean": 0.800859375,
+      "std": 0.2575258704957877,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.0128125,
+      "unique_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "body_build",
+      "mean": 0.5325,
+      "std": 0.12326293035621619,
+      "min": 0.5,
+      "max": 1.0,
+      "zero_rate": 0.0,
+      "unique_values": [
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "gender",
+      "mean": 0.8783033798122779,
+      "std": 0.19465883566738146,
+      "min": 0.4876500070095062,
+      "max": 0.9753000140190125,
+      "zero_rate": 0.0,
+      "unique_values": [
+        0.48765001,
+        0.97530001
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "hair_color",
+      "mean": 0.5705027237068862,
+      "std": 0.23691107295181504,
+      "min": 0.0,
+      "max": 0.8924999833106995,
+      "zero_rate": 0.04046875,
+      "unique_values": [
+        0.0,
+        0.44624999,
+        0.89249998
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "hair_length",
+      "mean": 0.6769664447335526,
+      "std": 0.21768662316832613,
+      "min": 0.0,
+      "max": 0.845300018787384,
+      "zero_rate": 0.0128125,
+      "unique_values": [
+        0.0,
+        0.42265001,
+        0.84530002
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "body_build",
+      "mean": 0.4116757598519325,
+      "std": 0.09529457373890464,
+      "min": 0.38655000925064087,
+      "max": 0.7731000185012817,
+      "zero_rate": 0.0,
+      "unique_values": [
+        0.38655001,
+        0.77310002
+      ]
+    }
+  ],
+  "full_cache_statistics": [
+    {
+      "mode": "none",
+      "attribute": "gender",
+      "mean": 0.9996647295485025,
+      "std": 0.018307322175073654,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.0003352704514975414,
+      "unique_values": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "mode": "none",
+      "attribute": "hair_color",
+      "mean": 0.9879302637460885,
+      "std": 0.10919733385333172,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.012069736253911488,
+      "unique_values": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "mode": "none",
+      "attribute": "hair_length",
+      "mean": 0.996312025033527,
+      "std": 0.06061661329304908,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.0036879749664729547,
+      "unique_values": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "mode": "none",
+      "attribute": "body_build",
+      "mean": 0.9997764863656683,
+      "std": 0.014948701481632585,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.00022351363433169424,
+      "unique_values": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "gender",
+      "mean": 0.9749730247429668,
+      "std": 0.01785513157400174,
+      "min": 0.0,
+      "max": 0.9753000140190125,
+      "zero_rate": 0.0003352704514975414,
+      "unique_values": [
+        0.0,
+        0.97530001
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "hair_color",
+      "mean": 0.8817277439055189,
+      "std": 0.09745861864167939,
+      "min": 0.0,
+      "max": 0.8924999833106995,
+      "zero_rate": 0.012069736253911488,
+      "unique_values": [
+        0.0,
+        0.89249998
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "hair_length",
+      "mean": 0.842182573478937,
+      "std": 0.05123922435544014,
+      "min": 0.0,
+      "max": 0.845300018787384,
+      "zero_rate": 0.0036879749664729547,
+      "unique_values": [
+        0.0,
+        0.84530002
+      ]
+    },
+    {
+      "mode": "attribute",
+      "attribute": "body_build",
+      "mean": 0.7729272201064447,
+      "std": 0.011556841392020496,
+      "min": 0.0,
+      "max": 0.7731000185012817,
+      "zero_rate": 0.00022351363433169424,
+      "unique_values": [
+        0.0,
+        0.77310002
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "gender",
+      "mean": 0.9042523468931605,
+      "std": 0.19716452191938233,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.0003352704514975414,
+      "unique_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "hair_color",
+      "mean": 0.640785650424676,
+      "std": 0.264344880813372,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.038611980330800176,
+      "unique_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "hair_length",
+      "mean": 0.801911041573536,
+      "std": 0.2578965932165543,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.013410818059901655,
+      "unique_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "confidence",
+      "attribute": "body_build",
+      "mean": 0.5312360303978543,
+      "std": 0.12146638391371142,
+      "min": 0.0,
+      "max": 1.0,
+      "zero_rate": 0.00022351363433169424,
+      "unique_values": [
+        0.0,
+        0.5,
+        1.0
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "gender",
+      "mean": 0.8819173266016244,
+      "std": 0.19229456099203654,
+      "min": 0.0,
+      "max": 0.9753000140190125,
+      "zero_rate": 0.0003352704514975414,
+      "unique_values": [
+        0.0,
+        0.48765001,
+        0.97530001
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "hair_color",
+      "mean": 0.571901182309759,
+      "std": 0.23592780171421793,
+      "min": 0.0,
+      "max": 0.8924999833106995,
+      "zero_rate": 0.038611980330800176,
+      "unique_values": [
+        0.0,
+        0.44624999,
+        0.89249998
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "hair_length",
+      "mean": 0.6778554185079206,
+      "std": 0.2179999950911766,
+      "min": 0.0,
+      "max": 0.845300018787384,
+      "zero_rate": 0.013410818059901655,
+      "unique_values": [
+        0.0,
+        0.42265001,
+        0.84530002
+      ]
+    },
+    {
+      "mode": "joint",
+      "attribute": "body_build",
+      "mean": 0.4106985849291286,
+      "std": 0.09390566365098682,
+      "min": 0.0,
+      "max": 0.7731000185012817,
+      "zero_rate": 0.00022351363433169424,
+      "unique_values": [
+        0.0,
+        0.38655001,
+        0.77310002
+      ]
+    }
+  ]
+}

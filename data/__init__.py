@@ -122,6 +122,8 @@ def build_dataloader(config):
                 dataset.train,
                 transform=transform_train,
                 caption_path=config.DATA.CAPTION_PATH,
+                semantic_cache=getattr(config.DATA, 'SEMANTIC_CACHE', None),
+                reliability_mode=getattr(config, 'SEMANTIC_RELIABILITY_MODE', 'none'),
             ),
             sampler=train_sampler,
             batch_size=config.DATA.TRAIN_BATCH, num_workers=config.DATA.NUM_WORKERS,

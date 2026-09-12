@@ -61,7 +61,8 @@ def tokenize(texts: Union[str, List[str]], tokenizer, context_length: int = 77, 
     return result
 
 
-def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair, optimizer, trainloader, pid2clothes):
+def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair, optimizer, trainloader, pid2clothes,
+                        semantic_bank=None, observer=None, stop_at=None):
     logger = logging.getLogger('cir_reid.train')
     batch_cla_loss = AverageMeter()
     batch_pair_loss = AverageMeter()
@@ -79,13 +80,22 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
     clip_model.train()
     end = time.time()
     for batch_idx, (imgs, pids, camids, clothes_ids, cap) in enumerate(trainloader):
+        semantic_guidance = None
+        if isinstance(cap, dict):
+            if semantic_bank is None:
+                raise ValueError('P2 data requires a frozen semantic embedding bank')
+            from data.semantic_reliability import aggregate_identity
+            semantic_guidance = aggregate_identity(
+                semantic_bank[cap['semantic_indices'].cuda()], cap['reliability'].cuda())
+            cap = cap['caption']
         images_in_batch = imgs.size(0)
         optimizer.zero_grad()
         reference_images = imgs.cuda()
         imgs, pids, clothes_ids = imgs.cuda(), pids.cuda(), clothes_ids.cuda()
         text_inputs = tokenize(cap, tokenizer, context_length=77, truncate=True).cuda()
         with torch.cuda.amp.autocast():
-            [cls_score, cls_score_proj], [img_feature, img_feature_proj], [com_proj, com_z, t_bn, t_z_bn] = clip_model(reference_images, text_inputs)
+            [cls_score, cls_score_proj], [img_feature, img_feature_proj], [com_proj, com_z, t_bn, t_z_bn] = clip_model(
+                reference_images, text_inputs, semantic_guidance=semantic_guidance)
             reference_features_proj = img_feature_proj
             cla_loss = criterion_cla(cls_score_proj, pids)
             # Use two independent per-sample coefficients as in Eq. (10)-(11).
@@ -106,9 +116,25 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
             loss = cla_loss + cir_com_loss + opl_loss
 
         # Backpropagate and update the weights
+        if observer is not None and not torch.isfinite(torch.stack((loss, cla_loss, cir_com_loss, opl_loss))).all():
+            raise FloatingPointError('Non-finite loss at epoch {} batch {}'.format(epoch + 1, batch_idx + 1))
         scaler.scale(loss).backward()
+        if observer is not None:
+            scaler.unscale_(optimizer)
+            if any(value.item() != 0 for value in scaler._found_inf_per_device(optimizer).values()):
+                raise FloatingPointError('Non-finite gradient at epoch {} batch {}'.format(epoch + 1, batch_idx + 1))
         scaler.step(optimizer)
         scaler.update()
+
+        if observer is not None:
+            torch.cuda.synchronize()
+            observer(dict(epoch=epoch + 1, iteration=batch_idx + 1,
+                          train_loss=loss.item(), id_loss=cla_loss.item(),
+                          triplet_loss=0.0, pair_loss=cir_com_loss.item(),
+                          pdf_opl_loss=opl_loss.item(), semantic_loss=0.0,
+                          learning_rate=optimizer.param_groups[0]['lr'],
+                          iteration_seconds=time.time() - end,
+                          batch_size=images_in_batch))
 
         batch_cla_loss.update(cla_loss.item(), reference_images.size(0))
         batch_pair_loss.update(cir_com_loss.item(), reference_images.size(0))
@@ -116,6 +142,8 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
+        if stop_at is not None and time.monotonic() >= stop_at:
+            break
 
         if (batch_idx + 1) % 20 == 0 or (batch_idx + 1) == len(trainloader):
             logger.info(

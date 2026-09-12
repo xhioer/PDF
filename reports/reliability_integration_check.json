@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "added_trainable_parameters": 0,
+  "trainable_parameters": 90469888,
+  "inference_shape": [
+    2,
+    512
+  ],
+  "inference_bitwise_equal": true,
+  "all_zero_evidence_equals_original_guidance": true,
+  "unknown_embedding_not_encoded": true,
+  "mode_fusion_max_absolute_differences": {
+    "none_vs_attribute": 0.00017477571964263916,
+    "none_vs_confidence": 0.0015831440687179565,
+    "none_vs_joint": 0.0016380250453948975,
+    "attribute_vs_confidence": 0.0015079975128173828,
+    "attribute_vs_joint": 0.0015628784894943237,
+    "confidence_vs_joint": 0.00022830069065093994
+  }
+}
