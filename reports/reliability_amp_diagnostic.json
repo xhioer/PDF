@@ -1,0 +1,386 @@
+{
+  "purpose": "diagnostic only; zero optimizer steps; failed smoke not resumed",
+  "config": "configs/v4_p2_joint.py",
+  "batch_size": 64,
+  "seed": 0,
+  "same_images": true,
+  "reset_rng_and_bn_before_each_probe": true,
+  "original_amp_default_initial_scale": 65536.0,
+  "scale_one_is_not_a_training_protocol_change": true,
+  "results": [
+    {
+      "variant": "V0",
+      "backward_scale": 65536.0,
+      "optimizer_steps": 0,
+      "loss": 8.882695198059082,
+      "id_loss": 5.013387680053711,
+      "pair_loss": 3.8027749061584473,
+      "pdf_opl_loss": 0.06653324514627457,
+      "loss_finite": true,
+      "all_gradients_finite": false,
+      "nonfinite_parameter_count": 32,
+      "nonfinite_parameters": [
+        {
+          "parameter": "visual.class_embedding",
+          "nan_count": 0,
+          "inf_count": 2
+        },
+        {
+          "parameter": "visual.positional_embedding",
+          "nan_count": 0,
+          "inf_count": 40
+        },
+        {
+          "parameter": "visual.conv1.weight",
+          "nan_count": 768,
+          "inf_count": 6363
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 5
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.attn.out_proj.weight",
+          "nan_count": 0,
+          "inf_count": 3
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 24
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 4
+        },
+        {
+          "parameter": "visual.transformer.resblocks.1.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 3
+        },
+        {
+          "parameter": "visual.transformer.resblocks.1.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 12
+        },
+        {
+          "parameter": "visual.transformer.resblocks.2.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 29
+        },
+        {
+          "parameter": "visual.transformer.resblocks.2.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 55
+        },
+        {
+          "parameter": "visual.transformer.resblocks.3.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 41
+        },
+        {
+          "parameter": "visual.transformer.resblocks.3.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 175
+        },
+        {
+          "parameter": "visual.transformer.resblocks.4.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 5
+        },
+        {
+          "parameter": "visual.transformer.resblocks.4.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 151
+        },
+        {
+          "parameter": "visual.transformer.resblocks.5.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 4
+        },
+        {
+          "parameter": "visual.transformer.resblocks.5.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 137
+        },
+        {
+          "parameter": "visual.transformer.resblocks.5.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 7
+        },
+        {
+          "parameter": "visual.transformer.resblocks.6.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 1
+        },
+        {
+          "parameter": "visual.transformer.resblocks.6.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 60
+        },
+        {
+          "parameter": "visual.transformer.resblocks.7.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 2
+        },
+        {
+          "parameter": "visual.transformer.resblocks.7.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 32
+        },
+        {
+          "parameter": "visual.transformer.resblocks.7.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 10
+        },
+        {
+          "parameter": "visual.transformer.resblocks.8.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 5
+        },
+        {
+          "parameter": "visual.transformer.resblocks.8.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 20
+        },
+        {
+          "parameter": "visual.transformer.resblocks.8.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 9
+        },
+        {
+          "parameter": "visual.transformer.resblocks.9.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 10
+        },
+        {
+          "parameter": "visual.transformer.resblocks.9.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 1
+        },
+        {
+          "parameter": "visual.transformer.resblocks.9.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 4
+        },
+        {
+          "parameter": "visual.transformer.resblocks.10.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 7
+        },
+        {
+          "parameter": "visual.transformer.resblocks.10.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 9
+        },
+        {
+          "parameter": "visual.transformer.resblocks.11.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 54
+        }
+      ]
+    },
+    {
+      "variant": "V0",
+      "backward_scale": 1.0,
+      "optimizer_steps": 0,
+      "loss": 8.882695198059082,
+      "id_loss": 5.013387680053711,
+      "pair_loss": 3.8027749061584473,
+      "pdf_opl_loss": 0.06653324514627457,
+      "loss_finite": true,
+      "all_gradients_finite": true,
+      "nonfinite_parameter_count": 0,
+      "nonfinite_parameters": []
+    },
+    {
+      "variant": "V4",
+      "backward_scale": 65536.0,
+      "optimizer_steps": 0,
+      "loss": 8.886598587036133,
+      "id_loss": 5.013387680053711,
+      "pair_loss": 3.8065571784973145,
+      "pdf_opl_loss": 0.06665422022342682,
+      "loss_finite": true,
+      "all_gradients_finite": false,
+      "nonfinite_parameter_count": 32,
+      "nonfinite_parameters": [
+        {
+          "parameter": "visual.class_embedding",
+          "nan_count": 0,
+          "inf_count": 2
+        },
+        {
+          "parameter": "visual.positional_embedding",
+          "nan_count": 0,
+          "inf_count": 41
+        },
+        {
+          "parameter": "visual.conv1.weight",
+          "nan_count": 768,
+          "inf_count": 6326
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 5
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.attn.out_proj.weight",
+          "nan_count": 0,
+          "inf_count": 3
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 26
+        },
+        {
+          "parameter": "visual.transformer.resblocks.0.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 4
+        },
+        {
+          "parameter": "visual.transformer.resblocks.1.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 3
+        },
+        {
+          "parameter": "visual.transformer.resblocks.1.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 12
+        },
+        {
+          "parameter": "visual.transformer.resblocks.2.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 29
+        },
+        {
+          "parameter": "visual.transformer.resblocks.2.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 54
+        },
+        {
+          "parameter": "visual.transformer.resblocks.3.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 40
+        },
+        {
+          "parameter": "visual.transformer.resblocks.3.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 175
+        },
+        {
+          "parameter": "visual.transformer.resblocks.4.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 6
+        },
+        {
+          "parameter": "visual.transformer.resblocks.4.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 149
+        },
+        {
+          "parameter": "visual.transformer.resblocks.5.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 4
+        },
+        {
+          "parameter": "visual.transformer.resblocks.5.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 136
+        },
+        {
+          "parameter": "visual.transformer.resblocks.5.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 8
+        },
+        {
+          "parameter": "visual.transformer.resblocks.6.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 1
+        },
+        {
+          "parameter": "visual.transformer.resblocks.6.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 60
+        },
+        {
+          "parameter": "visual.transformer.resblocks.7.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 2
+        },
+        {
+          "parameter": "visual.transformer.resblocks.7.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 31
+        },
+        {
+          "parameter": "visual.transformer.resblocks.7.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 10
+        },
+        {
+          "parameter": "visual.transformer.resblocks.8.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 5
+        },
+        {
+          "parameter": "visual.transformer.resblocks.8.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 20
+        },
+        {
+          "parameter": "visual.transformer.resblocks.8.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 9
+        },
+        {
+          "parameter": "visual.transformer.resblocks.9.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 10
+        },
+        {
+          "parameter": "visual.transformer.resblocks.9.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 1
+        },
+        {
+          "parameter": "visual.transformer.resblocks.9.mlp.c_proj.weight",
+          "nan_count": 0,
+          "inf_count": 4
+        },
+        {
+          "parameter": "visual.transformer.resblocks.10.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 7
+        },
+        {
+          "parameter": "visual.transformer.resblocks.10.mlp.c_fc.weight",
+          "nan_count": 0,
+          "inf_count": 9
+        },
+        {
+          "parameter": "visual.transformer.resblocks.11.attn.in_proj_weight",
+          "nan_count": 0,
+          "inf_count": 55
+        }
+      ]
+    },
+    {
+      "variant": "V4",
+      "backward_scale": 1.0,
+      "optimizer_steps": 0,
+      "loss": 8.886598587036133,
+      "id_loss": 5.013387680053711,
+      "pair_loss": 3.8065571784973145,
+      "pdf_opl_loss": 0.06665422022342682,
+      "loss_finite": true,
+      "all_gradients_finite": true,
+      "nonfinite_parameter_count": 0,
+      "nonfinite_parameters": []
+    }
+  ]
+}

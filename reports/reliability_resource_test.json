@@ -1,0 +1,41 @@
+{
+  "ready_for_long_training": false,
+  "tested_training_commit": "2bfba2f50f422512a82a8000665e7e9fc386c1dc",
+  "hardware": {"devices": 2, "name": "PPU-ZW810E", "memory_mib_per_device": 98304},
+  "single_process": {
+    "variant": "V4_p2_joint",
+    "device": 0,
+    "batch_size": 64,
+    "world_size": 1,
+    "requested_seconds": 300,
+    "status": "failed",
+    "reason": "Non-finite gradient at epoch 1 batch 1; stopped before optimizer.step",
+    "successful_optimizer_steps": 0,
+    "five_minute_smoke_completed": false,
+    "peak_training_memory_mib": null,
+    "steady_state_iteration_seconds": null,
+    "steady_state_images_per_second": null,
+    "memory_and_speed_note": "No valid sustained-training resource measurement is available; do not substitute initialization or forward-only memory/speed.",
+    "status_file": "outputs/pdf_reliability_ablation/preflight/single_V4/status.json",
+    "console_file": "outputs/pdf_reliability_ablation/preflight/single_V4/console.log"
+  },
+  "dual_process": {
+    "status": "not_started",
+    "reason": "Single-process no-NaN/Inf prerequisite failed",
+    "planned_device_0": ["V1_p2_none", "V2_p2_attribute"],
+    "planned_device_1": ["V3_p2_confidence", "V4_p2_joint"],
+    "peak_training_memory_mib": null,
+    "iteration_seconds": null,
+    "swap_test_passed": null,
+    "concurrency_recommendation": "undetermined until a successful shared-protocol smoke and dual-process test"
+  },
+  "diagnostic": {
+    "report": "reports/reliability_amp_diagnostic.json",
+    "optimizer_steps": 0,
+    "v0_and_v4_overflow_at_default_scale_65536": true,
+    "v0_and_v4_gradients_finite_at_diagnostic_scale_1": true,
+    "training_config_changed": false,
+    "failed_experiment_resumed": false
+  },
+  "formal_training_started": false
+}
