@@ -13,7 +13,7 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'outputs/pdf_reliability_ablation/preflight/adaptive_amp'
+OUT = ROOT / 'outputs/pdf_reliability_ablation/preflight/adaptive_amp_v2'
 PYTHON = '/data/envs/PDF/bin/python'
 SMI = '/usr/local/PPU_SDK/CUDA_SDK/bin/nvidia-smi'
 

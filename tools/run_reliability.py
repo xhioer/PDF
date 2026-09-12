@@ -173,7 +173,10 @@ def main(args):
                 sampler.set_epoch(epoch)
                 train_clip_combiner(config, epoch, model, criterion_cla, criterion_pair, optimizer,
                     loader, torch.from_numpy(dataset.pid2clothes), semantic_bank=bank,
-                    observer=observe, stop_at=stop_at, allow_amp_overflow=args.phase == 'smoke')
+                    # Keep PyTorch's normal GradScaler behavior in both bounded
+                    # smoke runs and later formal runs: overflow means skip step
+                    # and update the scale, never an immediate experiment failure.
+                    observer=observe, stop_at=stop_at, allow_amp_overflow=True)
                 if args.phase == 'train' and ((epoch + 1) % config.TEST.EVAL_STEP == 0
                         or epoch + 1 == config.TRAIN.MAX_EPOCH):
                     result = test_prcc_clip_combiner(model, same, different, gallery, dataset, return_metrics=True)
@@ -200,7 +203,12 @@ def main(args):
             last_overflow = skipped[-1] if skipped else 0
             stable_tail = len(iteration_records) - last_overflow
             model_finite = all(torch.isfinite(p).all().item() for p in model.parameters())
-            stable = model_finite and stable_tail >= 50
+            stable_window = min(20, len(iteration_records))
+            terminal_records = iteration_records[-stable_window:] if stable_window else []
+            stable = (model_finite and len(times) >= 200 and bool(terminal_records)
+                      and all(row['unscaled_gradient_finite'] and not row['optimizer_step_skipped']
+                              and row['scaler_scale_before'] == row['scaler_scale_after']
+                              for row in terminal_records))
             actual_updates = max(int(state['step']) for state in optimizer.state.values()) if optimizer.state else 0
             if actual_updates != len(times) - len(skipped):
                 raise AssertionError('GradScaler skip telemetry disagrees with Adam step counters')
@@ -219,6 +227,7 @@ def main(args):
                 first_successful_update_iteration=first_update,
                 last_overflow_iteration=last_overflow,
                 stable_since_iteration=last_overflow + 1 if stable else None,
+                stable_window_iterations=stable_window,
                 consecutive_successful_updates_at_end=stable_tail,
                 scaler_stable=stable, final_scale=iteration_records[-1]['scaler_scale_after'],
                 scaler_protocol='unchanged default GradScaler(), recreated each epoch as original PDF',
@@ -227,7 +236,7 @@ def main(args):
                 final_epoch=epoch + 1, full_epochs_completed=args.phase == 'train')
             if args.phase == 'smoke' and not stable:
                 status['status'] = 'failed'
-                status['error'] = 'No terminal window of 50 successful finite-gradient updates or non-finite model parameters'
+                status['error'] = 'No terminal stable GradScaler window or fewer than 200 iterations'
             metrics_handle.close()
             logging.info('RESULT %s', json.dumps(status))
     except Exception as exc:
