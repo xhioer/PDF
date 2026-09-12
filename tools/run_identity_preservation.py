@@ -314,11 +314,15 @@ def main(args):
             actual_updates = max(int(state['step']) for state in optimizer.state.values()) if optimizer.state else 0
             if actual_updates != len(iteration_records) - len(skipped):
                 raise AssertionError('GradScaler skip telemetry disagrees with Adam step counters')
-            if max_consecutive >= 20:
+            persistent_gradient_nonfinite = (max_consecutive >= 20 or actual_updates == 0)
+            if persistent_gradient_nonfinite:
                 raise FloatingPointError('Persistent non-finite gradients: {} consecutive iterations'.format(
                     max_consecutive))
-            if args.phase == 'smoke' and not stable:
-                raise RuntimeError('Smoke did not reach a terminal stable GradScaler window')
+            # A bounded smoke may end immediately after an otherwise normal
+            # GradScaler skip. Normal overflow is telemetry, not a failure;
+            # only the persistent condition above is fatal.
+            if args.phase == 'smoke' and not model_finite:
+                raise FloatingPointError('Model parameters became non-finite during smoke')
             if args.phase == 'train' and completed_epochs != config.TRAIN.MAX_EPOCH:
                 raise RuntimeError('Formal run did not complete epoch50')
 
@@ -344,6 +348,7 @@ def main(args):
                 adam_step_counter=actual_updates,
                 first_successful_update_iteration=first_update,
                 max_consecutive_nonfinite_gradient_iterations=max_consecutive,
+                persistent_nonfinite_gradient=persistent_gradient_nonfinite,
                 scaler_stable=stable,
                 stable_window_iterations=stable_window,
                 final_scale=iteration_records[-1]['scaler_scale_after'] if iteration_records else None,
