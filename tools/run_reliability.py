@@ -108,6 +108,7 @@ def main(args):
     write_json(output / 'status.json', status)
     loader = None
     times = []
+    iteration_records = []
     swaps_before = swap_counters()
     try:
         sanity = json.loads((ROOT / 'reports/reliability_sanity_check.json').read_text())
@@ -147,15 +148,19 @@ def main(args):
                 gamma=config.TRAIN.LR_SCHEDULER.DECAY_RATE, warmup_factor=0.1, warmup_iters=10)
             metrics_handle = (output / 'metrics.csv').open('w', newline='')
             columns = ('epoch', 'iteration', 'train_loss', 'id_loss', 'triplet_loss', 'pair_loss',
-                       'pdf_opl_loss', 'semantic_loss', 'learning_rate', 'iteration_seconds', 'batch_size')
+                       'pdf_opl_loss', 'semantic_loss', 'learning_rate', 'iteration_seconds', 'batch_size',
+                       'scaler_scale_before', 'scaler_scale_after', 'optimizer_step_skipped',
+                       'unscaled_gradient_finite', 'memory_allocated', 'memory_reserved', 'global_iteration')
             writer = csv.DictWriter(metrics_handle, fieldnames=columns)
             writer.writeheader()
 
             def observe(row):
+                row['global_iteration'] = len(iteration_records) + 1
                 writer.writerow(row)
                 metrics_handle.flush()
                 times.append(row['iteration_seconds'])
-                if len(times) == 1 or len(times) % 20 == 0:
+                iteration_records.append(row)
+                if len(times) == 1 or len(times) % 20 == 0 or row['optimizer_step_skipped']:
                     logging.info('METRICS %s', json.dumps(row))
 
             torch.cuda.reset_peak_memory_stats()
@@ -168,7 +173,7 @@ def main(args):
                 sampler.set_epoch(epoch)
                 train_clip_combiner(config, epoch, model, criterion_cla, criterion_pair, optimizer,
                     loader, torch.from_numpy(dataset.pid2clothes), semantic_bank=bank,
-                    observer=observe, stop_at=stop_at)
+                    observer=observe, stop_at=stop_at, allow_amp_overflow=args.phase == 'smoke')
                 if args.phase == 'train' and ((epoch + 1) % config.TEST.EVAL_STEP == 0
                         or epoch + 1 == config.TRAIN.MAX_EPOCH):
                     result = test_prcc_clip_combiner(model, same, different, gallery, dataset, return_metrics=True)
@@ -189,6 +194,16 @@ def main(args):
                     scheduler_state_dict=scheduler.state_dict(), epoch=epoch + 1, git_commit=commit,
                     config=config.dump()), output / 'final.pth')
             measured = times[5:] if len(times) > 5 else times
+            skipped = [row['global_iteration'] for row in iteration_records if row['optimizer_step_skipped']]
+            first_update = next((row['global_iteration'] for row in iteration_records
+                                 if not row['optimizer_step_skipped']), None)
+            last_overflow = skipped[-1] if skipped else 0
+            stable_tail = len(iteration_records) - last_overflow
+            model_finite = all(torch.isfinite(p).all().item() for p in model.parameters())
+            stable = model_finite and stable_tail >= 50
+            actual_updates = max(int(state['step']) for state in optimizer.state.values()) if optimizer.state else 0
+            if actual_updates != len(times) - len(skipped):
+                raise AssertionError('GradScaler skip telemetry disagrees with Adam step counters')
             status.update(status='passed' if args.phase == 'smoke' else 'complete',
                 completed_iterations=len(times), training_seconds=elapsed, measured_iterations=len(measured),
                 mean_iteration_seconds=statistics.mean(measured), median_iteration_seconds=statistics.median(measured),
@@ -196,8 +211,23 @@ def main(args):
                 peak_allocated_mib=torch.cuda.max_memory_allocated() / 2**20,
                 peak_reserved_mib=torch.cuda.max_memory_reserved() / 2**20,
                 swap_delta={key: swap_counters()[key] - value for key, value in swaps_before.items()},
-                no_nan_inf=True, no_oom=True, best_epoch=best_epoch,
+                no_nonfinite_loss=True, model_parameters_finite=model_finite,
+                gradient_overflow_iterations=skipped,
+                initial_overflow_count=(first_update - 1) if first_update else len(times),
+                overflow_count=len(skipped), successful_optimizer_updates=len(times) - len(skipped),
+                adam_step_counter=actual_updates,
+                first_successful_update_iteration=first_update,
+                last_overflow_iteration=last_overflow,
+                stable_since_iteration=last_overflow + 1 if stable else None,
+                consecutive_successful_updates_at_end=stable_tail,
+                scaler_stable=stable, final_scale=iteration_records[-1]['scaler_scale_after'],
+                scaler_protocol='unchanged default GradScaler(), recreated each epoch as original PDF',
+                all_iteration_mean_seconds=statistics.mean(times),
+                no_oom=True, best_epoch=best_epoch,
                 final_epoch=epoch + 1, full_epochs_completed=args.phase == 'train')
+            if args.phase == 'smoke' and not stable:
+                status['status'] = 'failed'
+                status['error'] = 'No terminal window of 50 successful finite-gradient updates or non-finite model parameters'
             metrics_handle.close()
             logging.info('RESULT %s', json.dumps(status))
     except Exception as exc:
@@ -206,6 +236,9 @@ def main(args):
         logging.exception('Experiment stopped; no hyperparameters will be changed')
         raise
     finally:
+        if torch.cuda.is_initialized():
+            status['peak_allocated_mib'] = torch.cuda.max_memory_allocated() / 2**20
+            status['peak_reserved_mib'] = torch.cuda.max_memory_reserved() / 2**20
         write_json(output / 'status.json', status)
         # Do not drain the prefetch queue on failure; the isolated process exits.
         if dist.is_initialized():

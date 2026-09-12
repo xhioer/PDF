@@ -62,7 +62,7 @@ def tokenize(texts: Union[str, List[str]], tokenizer, context_length: int = 77, 
 
 
 def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair, optimizer, trainloader, pid2clothes,
-                        semantic_bank=None, observer=None, stop_at=None):
+                        semantic_bank=None, observer=None, stop_at=None, allow_amp_overflow=False):
     logger = logging.getLogger('cir_reid.train')
     batch_cla_loss = AverageMeter()
     batch_pair_loss = AverageMeter()
@@ -118,10 +118,12 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
         # Backpropagate and update the weights
         if observer is not None and not torch.isfinite(torch.stack((loss, cla_loss, cir_com_loss, opl_loss))).all():
             raise FloatingPointError('Non-finite loss at epoch {} batch {}'.format(epoch + 1, batch_idx + 1))
+        scale_before = scaler.get_scale() if observer is not None else None
         scaler.scale(loss).backward()
         if observer is not None:
             scaler.unscale_(optimizer)
-            if any(value.item() != 0 for value in scaler._found_inf_per_device(optimizer).values()):
+            gradient_finite = not any(value.item() != 0 for value in scaler._found_inf_per_device(optimizer).values())
+            if not gradient_finite and not allow_amp_overflow:
                 raise FloatingPointError('Non-finite gradient at epoch {} batch {}'.format(epoch + 1, batch_idx + 1))
         scaler.step(optimizer)
         scaler.update()
@@ -133,6 +135,11 @@ def train_clip_combiner(config, epoch, clip_model, criterion_cla, criterion_pair
                           triplet_loss=0.0, pair_loss=cir_com_loss.item(),
                           pdf_opl_loss=opl_loss.item(), semantic_loss=0.0,
                           learning_rate=optimizer.param_groups[0]['lr'],
+                          scaler_scale_before=scale_before, scaler_scale_after=scaler.get_scale(),
+                          optimizer_step_skipped=not gradient_finite,
+                          unscaled_gradient_finite=gradient_finite,
+                          memory_allocated=torch.cuda.memory_allocated(),
+                          memory_reserved=torch.cuda.memory_reserved(),
                           iteration_seconds=time.time() - end,
                           batch_size=images_in_batch))
 
