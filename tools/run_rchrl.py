@@ -468,7 +468,7 @@ def init_accumulator():
         "raw_weight", "norm_weight", "active_rate", "raw_loss", "weighted_loss",
         "lambda_loss", "total_loss", "ratio", "pos_cos", "neg_cos", "pos_margin",
         "h_visual", "h_semantic", "h_hybrid", "r_conf", "r_agr", "r_joint",
-        "hinge_rate", "relation_grad", "visual_grad", "total_grad",
+        "hinge_rate", "relation_grad", "visual_grad", "total_grad", "finite_grad",
         "anchors", "positive_ids", "negative_ids", "edge_ids", "positive_edge_ids",
     )}
 
@@ -545,8 +545,19 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
         old_scale = scaler.get_scale()
         scaler.scale(total).backward()
         scaler.unscale_(optimizer)
-        total_grad = grad_norm(model.parameters())
-        visual_grad = grad_norm(visual_parameters)
+        gradient_finite = all(parameter.grad is None or
+                               bool(torch.isfinite(parameter.grad.detach()).all().item())
+                               for parameter in model.parameters())
+        if gradient_finite:
+            total_grad = grad_norm(model.parameters())
+            visual_grad = grad_norm(visual_parameters)
+        else:
+            # GradScaler will skip this update.  Keep epoch diagnostics
+            # numeric by averaging gradient norms over finite-gradient
+            # steps, while recording the skipped count separately.
+            total_grad = 0.0
+            visual_grad = 0.0
+        acc["finite_grad"].append(1.0 if gradient_finite else 0.0)
         scaler.step(optimizer)
         scaler.update()
         if not all(bool(torch.isfinite(parameter.detach()).all().item())
@@ -624,6 +635,9 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
         "lambda_over_total": mean_metric(acc, "ratio"),
         "relation_gradient_norm": mean_metric(acc, "relation_grad"),
         "visual_backbone_gradient_norm": mean_metric(acc, "visual_grad"),
+        "gradient_finite_rate": mean_metric(acc, "finite_grad"),
+        "nonfinite_gradient_steps": int(len(acc["finite_grad"]) -
+                                          sum(acc["finite_grad"])),
         "relation_grad_over_total_grad": float(mean_metric(acc, "relation_grad") /
                                                 (mean_metric(acc, "total_grad") + 1e-12)),
         "positive_cosine": mean_metric(acc, "pos_cos"),
@@ -784,6 +798,11 @@ def run_training(args, phase):
                        "peak_memory_bytes": int(torch.cuda.max_memory_allocated()),
                        "successful_optimizer_steps": int(sum(row["successful_optimizer_steps"] for row in rows)),
                        "amp_overflow_steps": int(sum(row["amp_overflow_steps"] for row in rows)),
+                       "gradient_finite_rate": float(np.average(
+                           [row["gradient_finite_rate"] for row in rows],
+                           weights=[row["batches"] for row in rows])),
+                       "nonfinite_gradient_steps": int(sum(
+                           row["nonfinite_gradient_steps"] for row in rows)),
                        "checkpoint_write": os.path.exists(smoke_path),
                        "evaluation_feature_shape": eval_result["feature_shape"],
                        "finite": all(row["finite"] for row in rows)},
@@ -804,6 +823,9 @@ def run_training(args, phase):
                        "iterations": int(sum(row["batches"] for row in rows)),
                        "rows": rows, "finite": all(row["finite"] for row in rows),
                        "optimizer_update_success": all(row["successful_optimizer_steps"] > 0 for row in rows),
+                       "gradient_finite_on_successful_updates": all(
+                           row["successful_optimizer_steps"] > 0 and
+                           row["gradient_finite_rate"] > 0.0 for row in rows),
                        "amp_overflow_steps": int(sum(row["amp_overflow_steps"] for row in rows)),
                        "unexpected_trainable_relation_parameters": 0},
                       os.path.join(args.output, "sanity.json"))
