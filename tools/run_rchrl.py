@@ -826,6 +826,11 @@ def run_training(args, phase):
                        "gradient_finite_on_successful_updates": all(
                            row["successful_optimizer_steps"] > 0 and
                            row["gradient_finite_rate"] > 0.0 for row in rows),
+                       "gradient_finite_rate": float(np.average(
+                           [row["gradient_finite_rate"] for row in rows],
+                           weights=[row["batches"] for row in rows])),
+                       "nonfinite_gradient_steps": int(sum(
+                           row["nonfinite_gradient_steps"] for row in rows)),
                        "amp_overflow_steps": int(sum(row["amp_overflow_steps"] for row in rows)),
                        "unexpected_trainable_relation_parameters": 0},
                       os.path.join(args.output, "sanity.json"))
