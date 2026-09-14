@@ -38,7 +38,7 @@ from test import concat_all_gather, extract_img_feature_clip_combiner
 from tools.eval_metrics import evaluate
 from tools.lr_scheduler import WarmupMultiStepLR
 from tools.rchrl_common import (
-    ATTRIBUTES, DATA_ROOT, ORIGINAL_CAPTION, REPO_ROOT, TrainCaptionDataset,
+    ATTRIBUTES, DATA_ROOT, ORIGINAL_CAPTION, REPO_ROOT, ImagePathDataset, TrainCaptionDataset,
     config_snapshot, feature_transform, json_dump, load_train_records,
     image_io_path, repo_commit, set_all_seeds, sha256_file, source_hashes,
     projected_image_cls,
@@ -425,6 +425,64 @@ def relation_loss(anchor, positive, negative, rel_batch, spec):
     }
 
 
+@torch.no_grad()
+def fixed_relation_diagnostics(config, model, relation_dataset, anchor_count=64):
+    """Measure all four frozen negative sets on fixed train anchors.
+
+    The training tuple uses only the variant-selected negative.  For the
+    required per-epoch diagnostics, score the same fixed train anchors against
+    their first frozen positive and top-1 member of each negative set.  This
+    adds a small inference-only pass and does not alter the training sampler,
+    graph, or objective.
+    """
+    if relation_dataset is None:
+        return {
+            "fixed_diagnostic_positive_cosine": None,
+            "matched_random_negative_cosine": None,
+            "visual_hard_negative_cosine": None,
+            "semantic_hard_negative_cosine": None,
+            "hybrid_hard_negative_cosine": None,
+            "relation_diagnostic_anchor_count": 0,
+        }
+    records = relation_dataset.records
+    count = min(int(anchor_count), len(records))
+    anchors = list(range(count))
+    positives = [int(relation_dataset.positive_pos[int(relation_dataset.offsets[a])])
+                 for a in anchors]
+    negative_groups = OrderedDict([
+        ("matched_random_negative_cosine", relation_dataset.matched_neg[anchors, 0].tolist()),
+        ("visual_hard_negative_cosine", relation_dataset.visual_neg[anchors, 0].tolist()),
+        ("semantic_hard_negative_cosine", relation_dataset.semantic_neg[anchors, 0].tolist()),
+        ("hybrid_hard_negative_cosine", relation_dataset.hybrid_neg[anchors, 0].tolist()),
+    ])
+    groups = OrderedDict([("fixed_diagnostic_positive_cosine", positives)])
+    groups.update((name, [int(x) for x in values])
+                  for name, values in negative_groups.items())
+    unique_indices = list(OrderedDict((int(index), None)
+                                      for values in groups.values() for index in values).keys())
+    index_to_position = {index: position for position, index in enumerate(unique_indices)}
+    transform = feature_transform(config)
+    loader = DataLoader(ImagePathDataset([records[index] for index in unique_indices], transform),
+                        batch_size=64, shuffle=False, num_workers=0,
+                        pin_memory=True, drop_last=False)
+    feature_matrix = torch.zeros((len(unique_indices), 512), dtype=torch.float32)
+    was_training = model.training
+    model.eval()
+    for images, positions in loader:
+        values = projected_image_cls(model.module, images.cuda(non_blocking=True)).float()
+        values = F.normalize(values, dim=1).cpu()
+        feature_matrix[positions] = values
+    if was_training:
+        model.train()
+    anchor_features = feature_matrix[[index_to_position[x] for x in anchors]]
+    result = {}
+    for name, indices in groups.items():
+        other = feature_matrix[[index_to_position[x] for x in indices]]
+        result[name] = float((anchor_features * other).sum(1).mean().item())
+    result["relation_diagnostic_anchor_count"] = count
+    return result
+
+
 def pdf_loss(config, clip_model, criterion_cla, criterion_pair, opl, tokenizer,
              imgs, pids, clothes_ids, cap):
     reference_images = imgs
@@ -609,6 +667,7 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
                         mean_metric(acc, "weighted_loss"), mean_metric(acc, "total_loss"))
         if duration_seconds is not None and time.time() - start >= duration_seconds:
             break
+    diagnostic = fixed_relation_diagnostics(config, model, relation_dataset)
     elapsed = time.time() - start
     unique_anchor = len(set(acc["anchors"]))
     unique_positive = len(set(acc["positive_ids"]))
@@ -647,6 +706,7 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
         "H_hybrid": mean_metric(acc, "h_hybrid"), "R_conf": mean_metric(acc, "r_conf"),
         "R_agr": mean_metric(acc, "r_agr"), "R_joint": mean_metric(acc, "r_joint"),
         "active_hinge_rate": mean_metric(acc, "hinge_rate"),
+        **diagnostic,
         "unique_anchors": unique_anchor, "unique_positive_images": unique_positive,
         "unique_negative_images": unique_negative, "unique_relation_edges": unique_edges,
         "positive_edge_coverage": float(unique_positive_edges / max(1, len(acc["positive_edge_ids"]))),
