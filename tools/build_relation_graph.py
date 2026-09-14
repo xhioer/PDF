@@ -589,6 +589,7 @@ def build_graph(checkpoint_path, output_dir):
         "p2_cache_validation": validation,
         "v0_checkpoint_sha256": checkpoint_hash,
         "v0_checkpoint_path": checkpoint_path,
+        "test_data_used": False,
         "no_test_adaptive_checkpoint_selection_was_used_for_relation_mining": True,
         "build_seconds": time.time() - t0,
     }

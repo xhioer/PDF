@@ -27,7 +27,7 @@ from torch.utils.data import DataLoader, Sampler
 from configs.default_img import _C
 from data.dataloader import DataLoaderX
 from data.dataset_loader import ImageDataset
-from data.img_transforms import build_img_transforms
+from data import build_img_transforms
 from data.samplers import DistributedInferenceSampler
 from data.datasets.prcc import PRCC
 from losses import build_losses
