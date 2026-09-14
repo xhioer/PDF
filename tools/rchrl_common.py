@@ -28,6 +28,7 @@ P2_CACHE = "/data/projects/ccreid-semantic-consistency-exp0/outputs/exp1_full_pr
 P2_RULES = "/data/projects/ccreid-semantic-consistency-exp0/configs/normalization_rules_v2.json"
 P2_VALIDATION = "/data/projects/PDF-worktrees/pdf-reliability-ablation/reports/prcc_semantic_cache_validation.json"
 ORIGINAL_CAPTION = os.path.join(REPO_ROOT, "data", "captions", "prcc.json")
+LOCAL_IO_ROOT = os.environ.get("RCHRL_LOCAL_PRCC_ROOT", "")
 ATTRIBUTES = ("gender", "hair_color", "hair_length", "body_build")
 CONFIDENCE_VALUES = {"high": 1.0, "medium": 0.5, "low": 0.0, "unknown": 0.0}
 CAMERA_TO_INT = {"A": 0, "B": 1, "C": 2}
@@ -110,6 +111,14 @@ def _canonical_path(path):
     # Do not call Path.resolve() here: the PRCC mount is an object-backed
     # filesystem and resolving every image causes avoidable metadata walks.
     return os.path.normpath(str(path))
+
+
+def image_io_path(path):
+    """Map only image reads to an optional local byte-for-byte staging copy."""
+    path = _canonical_path(path)
+    if LOCAL_IO_ROOT and path.startswith(DATA_ROOT + os.sep):
+        return _canonical_path(LOCAL_IO_ROOT + path[len(DATA_ROOT):])
+    return path
 
 
 def _train_clothes_key(pid_string, camera):
@@ -291,7 +300,7 @@ class ImagePathDataset(Dataset):
 
     def __getitem__(self, index):
         row = self.records[index]
-        with Image.open(row["path"]) as image:
+        with Image.open(image_io_path(row["path"])) as image:
             image = image.convert("RGB")
         return self.transform(image), index
 
@@ -323,7 +332,7 @@ class TrainCaptionDataset(Dataset):
 
     def __getitem__(self, index):
         row = self.records[index]
-        with Image.open(row["path"]) as image:
+        with Image.open(image_io_path(row["path"])) as image:
             image = image.convert("RGB")
         return (self.transform(image), row["person_id"], row["camera_id"],
                 row["clothes_id"], self.captions[row["caption_key"]])

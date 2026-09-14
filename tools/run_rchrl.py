@@ -40,7 +40,7 @@ from tools.lr_scheduler import WarmupMultiStepLR
 from tools.rchrl_common import (
     ATTRIBUTES, DATA_ROOT, ORIGINAL_CAPTION, REPO_ROOT, TrainCaptionDataset,
     config_snapshot, feature_transform, json_dump, load_train_records,
-    repo_commit, set_all_seeds, sha256_file, source_hashes,
+    image_io_path, repo_commit, set_all_seeds, sha256_file, source_hashes,
 )
 from train import tokenize as pdf_tokenize
 
@@ -246,7 +246,7 @@ class RelationTupleDataset(torch.utils.data.Dataset):
         positive_flat, positive, negative, slot, h_visual, h_semantic, h_hybrid = self._pick(anchor)
         images = []
         for index in (anchor, positive, negative):
-            with Image.open(self.records[index]["path"]) as image:
+            with Image.open(image_io_path(self.records[index]["path"])) as image:
                 images.append(self.transform(image.convert("RGB")))
         return (images[0], images[1], images[2], int(anchor), int(positive), int(negative),
                 float(self.r_conf[positive_flat]), float(self.r_agr[positive_flat]),
@@ -285,6 +285,13 @@ def build_eval_loaders(config):
     """Construct TEST loaders only at evaluation time."""
     dataset = PRCC(root=DATA_ROOT)
     _, transform_test = build_img_transforms(config)
+    # The dataset metadata remain the original PRCC TEST metadata; only the
+    # bytes are optionally read from the validated local staging copy.
+    def mapped(items):
+        return [(image_io_path(path), pid, camid, clothes) for path, pid, camid, clothes in items]
+    dataset.query_same = mapped(dataset.query_same)
+    dataset.query_diff = mapped(dataset.query_diff)
+    dataset.gallery = mapped(dataset.gallery)
     common = {"num_workers": config.DATA.NUM_WORKERS, "pin_memory": True,
               "drop_last": False}
     same = DataLoaderX(dataset=ImageDataset(dataset.query_same, transform_test),
