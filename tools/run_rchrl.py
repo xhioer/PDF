@@ -283,7 +283,8 @@ def build_relation_loader(config, records, graph_dir, variant, seed, epoch=0):
 
 def build_eval_loaders(config):
     """Construct TEST loaders only at evaluation time."""
-    dataset = PRCC(root=DATA_ROOT)
+    eval_root = os.environ.get("RCHRL_LOCAL_PRCC_ROOT", DATA_ROOT)
+    dataset = PRCC(root=eval_root)
     _, transform_test = build_img_transforms(config)
     # The dataset metadata remain the original PRCC TEST metadata; only the
     # bytes are optionally read from the validated local staging copy.
