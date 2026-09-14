@@ -458,8 +458,10 @@ def fixed_relation_diagnostics(config, model, relation_dataset, anchor_count=64)
     groups = OrderedDict([("fixed_diagnostic_positive_cosine", positives)])
     groups.update((name, [int(x) for x in values])
                   for name, values in negative_groups.items())
-    unique_indices = list(OrderedDict((int(index), None)
-                                      for values in groups.values() for index in values).keys())
+    unique_indices = list(OrderedDict(
+        (int(index), None)
+        for values in [anchors] + list(groups.values())
+        for index in values).keys())
     index_to_position = {index: position for position, index in enumerate(unique_indices)}
     transform = feature_transform(config)
     loader = DataLoader(ImagePathDataset([records[index] for index in unique_indices], transform),
