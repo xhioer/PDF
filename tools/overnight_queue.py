@@ -55,6 +55,7 @@ def main():
     active = {}
     completed = []
     failed = None
+    runtime_gate_reached = False
     next_index = 0
     port = 29620
     python = sys.executable
@@ -64,11 +65,13 @@ def main():
     env_base["RCHRL_LOCAL_PRCC_ROOT"] = "/tmp/rchrl_prcc"
     start = time.time()
     while next_index < len(queue) or active:
-        if time.time() - start > args.max_hours * 3600:
-            failed = {"reason": "runtime_limit_exceeded", "hours": args.max_hours}
-            break
+        if time.time() - start >= args.max_hours * 3600:
+            # Runtime gating stops claiming new work but lets the currently
+            # running high-priority jobs finish.  The old behavior marked a
+            # normal gate hit as a failure and terminated active experiments.
+            runtime_gate_reached = True
         for gpu in args.gpus:
-            if gpu in active or next_index >= len(queue) or failed:
+            if gpu in active or next_index >= len(queue) or failed or runtime_gate_reached:
                 continue
             task = queue[next_index]
             next_index += 1
@@ -106,6 +109,8 @@ def main():
             write_status(status_path, status)
         if failed:
             break
+        if runtime_gate_reached and not active:
+            break
         time.sleep(2.0)
     if failed:
         for process, task, log_handle in active.values():
@@ -118,7 +123,15 @@ def main():
     status["elapsed_seconds"] = status["finished"] - status["started"]
     status["completed_count"] = len([x for x in status["tasks"] if x.get("status") == "complete"])
     status["queue_length"] = len(queue)
-    status["status"] = "complete" if not failed and status["completed_count"] == len(queue) else "failed"
+    status["runtime_gate_reached"] = runtime_gate_reached
+    status["next_queue_index"] = next_index
+    status["remaining_tasks"] = queue[next_index:]
+    if failed:
+        status["status"] = "failed"
+    elif runtime_gate_reached and status["completed_count"] < len(queue):
+        status["status"] = "runtime_gate_stop"
+    else:
+        status["status"] = "complete"
     write_status(status_path, status)
     if failed:
         raise SystemExit(2)
