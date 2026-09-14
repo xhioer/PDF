@@ -21,10 +21,12 @@ def tasks(root):
     }
     for run_id, name in seed0_names.items():
         result.append({"seed": 0, "run_id": run_id,
+                       "priority": 1,
                        "output": os.path.join(root, "seed0", name)})
     for seed in (1, 2):
         for run_id in ("R00", "R04", "R07", "R11"):
             result.append({"seed": seed, "run_id": run_id,
+                           "priority": 2 if seed == 1 else 3,
                            "output": os.path.join(root, "seed{}".format(seed), run_id)})
     return result
 
