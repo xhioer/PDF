@@ -13,7 +13,7 @@ import math
 import os
 import shutil
 import time
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 
 import numpy as np
 import torch
@@ -567,8 +567,8 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
         append_metric(acc, "visual_grad", visual_grad)
         append_metric(acc, "total_grad", total_grad)
         if rel:
-            append_metric(acc, "raw_weight", rel["raw_weight"].mean())
-            append_metric(acc, "norm_weight", rel["norm_weight"].mean())
+            acc["raw_weight"].extend(rel["raw_weight"].detach().float().cpu().numpy().tolist())
+            acc["norm_weight"].extend(rel["norm_weight"].detach().float().cpu().numpy().tolist())
             append_metric(acc, "active_rate", rel["active_rate"])
             append_metric(acc, "pos_cos", rel["pos_cos"])
             append_metric(acc, "neg_cos", rel["neg_cos"])
@@ -612,6 +612,9 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
         "raw_weight_zero_rate": float(np.mean(np.asarray(acc["raw_weight"]) == 0.0)) if acc["raw_weight"] else 0.0,
         "normalized_weight_mean": mean_metric(acc, "norm_weight"),
         "normalized_weight_std": float(np.std(acc["norm_weight"])) if acc["norm_weight"] else 0.0,
+        "normalized_active_weight_mean": float(np.mean(np.asarray(acc["norm_weight"])[
+            np.asarray(acc["raw_weight"]) > 0.0])) if acc["raw_weight"] and
+            np.any(np.asarray(acc["raw_weight"]) > 0.0) else 0.0,
         "active_edge_rate": mean_metric(acc, "active_rate"),
         "raw_relation_loss_before_weight": mean_metric(acc, "raw_loss"),
         "weighted_relation_loss_before_lambda": mean_metric(acc, "weighted_loss"),
@@ -634,7 +637,7 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
         "positive_edge_coverage": float(unique_positive_edges / max(1, len(acc["positive_edge_ids"]))),
         "negative_edge_coverage": float(unique_edges / max(1, len(acc["edge_ids"]))),
         "edge_repeat_rate": float(1.0 - unique_edges / max(1, len(acc["edge_ids"]))),
-        "max_edge_repeats": int(max([acc["edge_ids"].count(x) for x in set(acc["edge_ids"])] or [0])),
+        "max_edge_repeats": int(max(Counter(acc["edge_ids"]).values() or [0])),
         "successful_optimizer_steps": successful_steps,
         "amp_overflow_steps": overflow_steps,
         "finite": True,
