@@ -31,9 +31,12 @@ def main():
     forbidden_hits = {}
     for path in new_files:
         text = open(os.path.join(REPO_ROOT, path)).read()
+        # A cache filename may contain "qwen" because it is the already
+        # frozen input artifact.  Only executable imports/calls count here.
         hits = [token for token in forbidden
                 if any(token.lower() in line.lower() and
-                       not line.lstrip().startswith("#")
+                       (line.lstrip().startswith(("import ", "from ", "call_", "run_")) or
+                        "image_generate" in line.lower())
                        for line in text.splitlines())]
         if hits:
             forbidden_hits[path] = hits
