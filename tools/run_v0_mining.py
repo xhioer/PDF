@@ -33,7 +33,7 @@ from tools.rchrl_common import (
 )
 
 
-def make_config(seed, output):
+def make_config(seed, output, max_epoch=50):
     config = _C.clone()
     config.defrost()
     config.DATA.ROOT = DATA_ROOT
@@ -42,7 +42,7 @@ def make_config(seed, output):
     config.DATA.TEST_BATCH = 64
     config.DATA.NUM_WORKERS = 4
     config.DATA.NUM_INSTANCES = 8
-    config.TRAIN.MAX_EPOCH = 50
+    config.TRAIN.MAX_EPOCH = int(max_epoch)
     config.TRAIN.OPTIMIZER.LR = 3.5e-7
     config.TRAIN.OPTIMIZER.WEIGHT_DECAY = 5e-4
     config.TRAIN.LR_SCHEDULER.STEPSIZE = [20, 40]
@@ -73,6 +73,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--max-epoch", type=int, default=50)
     args = parser.parse_args()
 
     if not dist.is_initialized():
@@ -87,7 +88,7 @@ def main():
     if len(records) != 17896 or len(pid_strings) != 150:
         raise RuntimeError("Unexpected train inventory: {} images / {} IDs".format(
             len(records), len(pid_strings)))
-    config = make_config(args.seed, args.output)
+    config = make_config(args.seed, args.output, args.max_epoch)
     transform_train, _ = __import__("data", fromlist=["build_img_transforms"]).build_img_transforms(config)
     train_dataset = TrainCaptionDataset(records, transform_train, ORIGINAL_CAPTION)
     train_tuples = [(row["path"], row["person_id"], row["camera_id"], row["clothes_id"])
@@ -127,16 +128,17 @@ def main():
                             torch.from_numpy(pid2clothes))
         scheduler.step()
         if rank == 0:
-            logger.info("V0 epoch %d/50 completed", epoch + 1)
+            logger.info("V0 epoch %d/%d completed", epoch + 1, config.TRAIN.MAX_EPOCH)
 
     if rank == 0:
-        checkpoint_path = os.path.join(args.output, "epoch50_final.pth")
+        checkpoint_name = "epoch50_final.pth" if args.max_epoch == 50 else "epoch{}_test.pth".format(args.max_epoch)
+        checkpoint_path = os.path.join(args.output, checkpoint_name)
         torch.save({
             "model_state_dict": clip_model.module.state_dict(),
-            "epoch": 50,
+            "epoch": int(args.max_epoch),
             "training_seed": int(args.seed),
             "train_only": True,
-            "checkpoint_selection": "fixed epoch50 final; no test-adaptive selection",
+            "checkpoint_selection": "fixed epoch50 final; no test-adaptive selection" if args.max_epoch == 50 else "development smoke; not valid for mining",
             "source_commit": repo_commit(REPO_ROOT),
             "config_snapshot": config_snapshot(config),
             "train_protocol": {
@@ -145,7 +147,7 @@ def main():
                 "image_size": [384, 128],
                 "batch": 64,
                 "world_size": 1,
-                "epochs": 50,
+                "epochs": int(args.max_epoch),
                 "optimizer": "Adam",
                 "lr": 3.5e-7,
                 "weight_decay": 5e-4,
@@ -156,53 +158,56 @@ def main():
                 "evaluation": "not run",
             },
         }, checkpoint_path)
-        provenance = {
-            "experiment": "RCHRL-V1",
-            "purpose": "fixed Original PDF epoch50 final checkpoint for train-only relation mining",
-            "checkpoint_path": checkpoint_path,
-            "checkpoint_sha256": sha256_file(checkpoint_path),
-            "source_commit": repo_commit(REPO_ROOT),
-            "source_core_file_sha256": source_hashes(REPO_ROOT),
-            "training_seed": int(args.seed),
-            "epoch": 50,
-            "train_only": True,
-            "test_adaptive_checkpoint_selection": False,
-            "no_test_adaptive_checkpoint_selection_was_used_for_relation_mining": True,
-            "test_metadata_loaded_during_training": False,
-            "test_features_loaded_during_training": False,
-            "test_captions_loaded_during_training": False,
-            "test_metrics_loaded_during_training": False,
-            "train_inventory": {"images": len(records), "ids": len(pid_strings)},
-            "config_snapshot": config_snapshot(config),
-            "train_protocol": {
-                "dataset": "PRCC TRAIN",
-                "backbone": "ViT-B/16",
-                "resolution": "384x128",
-                "batch": 64,
-                "world": 1,
-                "epochs": 50,
-                "optimizer": "Adam",
-                "lr": 3.5e-7,
-                "weight_decay": 5e-4,
-                "milestones": [20, 40],
-                "gamma": 0.1,
-                "same_augmentation": True,
-                "amp_grad_scaler": True,
-                "loss_family": "current Original PDF L_PDF",
-                "relation_loss": None,
-                "primary_checkpoint": "epoch50_final.pth",
-            },
-            "wall_clock_seconds": time.time() - start,
-        }
-        json_dump(provenance, os.path.join(REPO_ROOT, "reports", "v0_mining_checkpoint_provenance.json"))
-        json_dump({
-            "status": "complete",
-            "checkpoint": checkpoint_path,
-            "checkpoint_sha256": provenance["checkpoint_sha256"],
-            "epoch": 50,
-            "train_only": True,
-            "elapsed_seconds": time.time() - start,
-        }, os.path.join(args.output, "v0_training_summary.json"))
+        if args.max_epoch != 50:
+            json_dump({"status": "development_only", "checkpoint": checkpoint_path,
+                       "epoch": int(args.max_epoch)},
+                      os.path.join(args.output, "v0_development_summary.json"))
+        else:
+            provenance = {
+                "experiment": "RCHRL-V1",
+                "purpose": "fixed Original PDF epoch50 final checkpoint for train-only relation mining",
+                "checkpoint_path": checkpoint_path,
+                "checkpoint_sha256": sha256_file(checkpoint_path),
+                "source_commit": repo_commit(REPO_ROOT),
+                "source_core_file_sha256": source_hashes(REPO_ROOT),
+                "training_seed": int(args.seed),
+                "epoch": 50,
+                "train_only": True,
+                "test_adaptive_checkpoint_selection": False,
+                "no_test_adaptive_checkpoint_selection_was_used_for_relation_mining": True,
+                "test_metadata_loaded_during_training": False,
+                "test_features_loaded_during_training": False,
+                "test_captions_loaded_during_training": False,
+                "test_metrics_loaded_during_training": False,
+                "train_inventory": {"images": len(records), "ids": len(pid_strings)},
+                "config_snapshot": config_snapshot(config),
+                "train_protocol": {
+                    "dataset": "PRCC TRAIN",
+                    "backbone": "ViT-B/16",
+                    "resolution": "384x128",
+                    "batch": 64,
+                    "world": 1,
+                    "epochs": 50,
+                    "optimizer": "Adam",
+                    "lr": 3.5e-7,
+                    "weight_decay": 5e-4,
+                    "milestones": [20, 40],
+                    "gamma": 0.1,
+                    "same_augmentation": True,
+                    "amp_grad_scaler": True,
+                    "loss_family": "current Original PDF L_PDF",
+                    "relation_loss": None,
+                    "primary_checkpoint": "epoch50_final.pth",
+                },
+                "wall_clock_seconds": time.time() - start,
+            }
+            json_dump(provenance, os.path.join(REPO_ROOT, "reports", "v0_mining_checkpoint_provenance.json"))
+        summary = {"status": "complete" if args.max_epoch == 50 else "development_only",
+                   "checkpoint": checkpoint_path, "epoch": int(args.max_epoch),
+                   "train_only": True, "elapsed_seconds": time.time() - start}
+        if args.max_epoch == 50:
+            summary["checkpoint_sha256"] = provenance["checkpoint_sha256"]
+        json_dump(summary, os.path.join(args.output, "v0_training_summary.json"))
         logger.info("V0 epoch50 final written: %s", checkpoint_path)
     if hasattr(trainloader, "shutdown"):
         trainloader.shutdown()
