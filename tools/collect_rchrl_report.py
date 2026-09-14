@@ -87,6 +87,20 @@ def metric_table(rows, include_seed=True):
     return "\n".join(lines)
 
 
+def metric_table_full(rows, include_seed=True):
+    lines = ["| Seed | Run | Status | Diff R1 | Diff R5 | Diff R10 | Diff R20 | Diff mAP | Same R1 | Same R5 | Same R10 | Same R20 | Same mAP |",
+             "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for row in rows:
+        result = final_eval(row["path"]) or {}
+        diff = result.get("different", {})
+        same = result.get("same", {})
+        lines.append("| {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |".format(
+            row["seed"] if include_seed else "", row["run_id"], row["status"],
+            pp(diff.get("R1")), pp(diff.get("R5")), pp(diff.get("R10")), pp(diff.get("R20")), pp(diff.get("mAP")),
+            pp(same.get("R1")), pp(same.get("R5")), pp(same.get("R10")), pp(same.get("R20")), pp(same.get("mAP"))))
+    return "\n".join(lines)
+
+
 def json_code(obj):
     return "```json\n{}\n```".format(json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False))
 
@@ -103,6 +117,8 @@ def main():
     graph_stats = read_json(os.path.join(args.graph, "relation_graph_stats.json"), {}) or {}
     graph_manifest = read_json(os.path.join(args.graph, "relation_graph_manifest.json"), {}) or {}
     graph_ledger = read_json(os.path.join(args.graph, "relation_graph_hashes.json"), {}) or {}
+    graph_validation = read_json(os.path.join(ROOT, "reports", "rchrl_v1_graph_validation.json"), {}) or {}
+    runtime_gate = read_json(os.path.join(ROOT, "reports", "rchrl_v1_runtime_gate.json"), {}) or {}
     queue = read_json(os.path.join(args.root, "queue_status.json"), {}) or {}
     extreme_path = os.path.join(ROOT, "reports", "extreme_hard_negative_audit.csv")
     extreme_count = 0
@@ -234,6 +250,9 @@ def main():
     lines.append("Hash ledger（graph freeze 后未重新 mining）：")
     lines.append(graph_file_lines)
     lines.append("")
+    lines.append("独立 train-index validation：")
+    lines.append(json_code(graph_validation))
+    lines.append("")
     lines.append("## 4. Raw reliability distributions")
     lines.append("")
     lines.append(json_code({key: reliability.get(key) for key in ("R_conf", "R_agr", "R_joint", "collapse_warning") if key in reliability}))
@@ -279,7 +298,7 @@ def main():
     lines.append("")
     lines.append("## 10. Runtime benchmark and gate")
     lines.append("")
-    lines.append(json_code({"smoke": smoke_rows, "queue": queue}))
+    lines.append(json_code({"smoke": smoke_rows, "runtime_gate": runtime_gate, "queue": queue}))
     lines.append("")
     lines.append("smoke 覆盖 train dataloader、relation sampler（R04）、forward/backward、AMP step、checkpoint write、image-only evaluation feature extraction/shape。正式调度 max_concurrent_jobs=2、max_jobs_per_device=1。")
     lines.append("")
@@ -290,6 +309,10 @@ def main():
     lines.append("## 12. Seed0 full table")
     lines.append("")
     lines.append(metric_table(main_rows, include_seed=False))
+    lines.append("")
+    lines.append("完整 Same/Different Clothes metrics（epoch50 primary）：")
+    lines.append("")
+    lines.append(metric_table_full(main_rows, include_seed=False))
     lines.append("")
     lines.append("## 13. Main chain R00 → R04 → R07 → R11")
     lines.append("")
