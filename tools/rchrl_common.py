@@ -180,10 +180,14 @@ def load_train_records(train_root=TRAIN_ROOT):
 
     clothes_keys = set()
     raw = []
+    cached_paths_by_person = defaultdict(list)
+    if cached_paths:
+        for path in raw_paths:
+            cached_paths_by_person[os.path.dirname(path)].append(path)
     for person_dir in person_dirs:
         pid_string = os.path.basename(person_dir)
         if cached_paths:
-            paths = [path for path in raw_paths if os.path.dirname(path) == _canonical_path(person_dir)]
+            paths = cached_paths_by_person.get(_canonical_path(person_dir), [])
         else:
             paths = sorted(os.path.join(person_dir, name) for name in os.listdir(person_dir)
                            if name.lower().endswith(".jpg"))
