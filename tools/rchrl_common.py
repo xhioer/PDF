@@ -117,13 +117,35 @@ def _train_clothes_key(pid_string, camera):
 
 
 def load_train_records(train_root=TRAIN_ROOT):
-    """Reproduce PRCC's train parsing without touching val or test."""
-    person_dirs = sorted(
-        os.path.join(train_root, name)
-        for name in os.listdir(train_root)
-        if os.path.isdir(os.path.join(train_root, name))
-    )
-    pid_strings = [os.path.basename(path) for path in person_dirs]
+    """Reproduce PRCC's train parsing without touching val or test.
+
+    The cache validation already establishes a one-to-one mapping between the
+    17,896 cache paths and PRCC TRAIN.  Reading those path strings avoids a
+    very slow per-directory object-store walk; no semantic cache field is
+    inspected here.
+    """
+    cached_paths = []
+    if os.path.exists(P2_CACHE):
+        with open(P2_CACHE) as handle:
+            for line in handle:
+                row = json.loads(line)
+                path = _canonical_path(row["image_path"])
+                if not path.startswith(_canonical_path(train_root) + os.sep):
+                    raise RuntimeError("Non-train path encountered in train inventory: {}".format(path))
+                cached_paths.append(path)
+    if len(cached_paths) == 17896 and len(set(cached_paths)) == 17896:
+        raw_paths = sorted(cached_paths)
+        pid_strings = sorted(set(os.path.basename(os.path.dirname(path)) for path in raw_paths),
+                             key=lambda x: int(x))
+        person_dirs = [os.path.join(train_root, name) for name in pid_strings]
+    else:
+        person_dirs = sorted(
+            os.path.join(train_root, name)
+            for name in os.listdir(train_root)
+            if os.path.isdir(os.path.join(train_root, name))
+        )
+        pid_strings = [os.path.basename(path) for path in person_dirs]
+        pid_strings.sort(key=lambda x: int(x))
     pid_strings.sort(key=lambda x: int(x))
     pid_to_label = {pid: idx for idx, pid in enumerate(pid_strings)}
 
@@ -131,8 +153,12 @@ def load_train_records(train_root=TRAIN_ROOT):
     raw = []
     for person_dir in person_dirs:
         pid_string = os.path.basename(person_dir)
-        for path in sorted(os.path.join(person_dir, name) for name in os.listdir(person_dir)
-                           if name.lower().endswith(".jpg")):
+        if cached_paths:
+            paths = [path for path in raw_paths if os.path.dirname(path) == _canonical_path(person_dir)]
+        else:
+            paths = sorted(os.path.join(person_dir, name) for name in os.listdir(person_dir)
+                           if name.lower().endswith(".jpg"))
+        for path in paths:
             name = os.path.basename(path)
             camera = name[0]
             if camera not in CAMERA_TO_INT:
@@ -334,4 +360,3 @@ def source_hashes(cwd=REPO_ROOT):
              "data/__init__.py", "data/dataset_loader.py", "losses/contrastive_loss.py",
              "losses/orthogonal_loss.py"]
     return {path: sha256_file(os.path.join(cwd, path)) for path in paths}
-
