@@ -107,6 +107,26 @@ def p2_phrase(attribute, value):
     return "A person with {}: {}.".format(attribute.replace("_", " "), value)
 
 
+def projected_image_cls(model, images):
+    """Return the projected ViT CLS feature used by the frozen PDF loss.
+
+    This repository's ``CLIP.encode_image`` helper predates the local
+    VisionTransformer return signature (``(projected_tokens, tokens)``), so
+    calling it directly would attempt tuple indexing.  Keeping this adapter
+    in the RCHRL tools avoids modifying the frozen model/inference files and
+    makes the relation feature definition explicit and auditable.
+    """
+    visual_output = model.visual(images.type(model.dtype))
+    if isinstance(visual_output, (tuple, list)):
+        visual_output = visual_output[0]
+    if visual_output.dim() == 3:
+        visual_output = visual_output[:, 0, :]
+    if visual_output.dim() != 2:
+        raise RuntimeError("unexpected projected image feature shape: {}".format(
+            tuple(visual_output.shape)))
+    return visual_output.float()
+
+
 def _canonical_path(path):
     # Do not call Path.resolve() here: the PRCC mount is an object-backed
     # filesystem and resolving every image causes avoidable metadata walks.

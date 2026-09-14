@@ -83,6 +83,7 @@ def main():
     os.makedirs(args.output, exist_ok=True)
     logger = configure_logging(os.path.join(args.output, "v0_training.log")) if rank == 0 else None
     set_all_seeds(args.seed)
+    launch_source_commit = repo_commit(REPO_ROOT)
 
     records, pid_strings, clothes_keys, pid2clothes = load_train_records()
     if len(records) != 17896 or len(pid_strings) != 150:
@@ -139,7 +140,7 @@ def main():
             "training_seed": int(args.seed),
             "train_only": True,
             "checkpoint_selection": "fixed epoch50 final; no test-adaptive selection" if args.max_epoch == 50 else "development smoke; not valid for mining",
-            "source_commit": repo_commit(REPO_ROOT),
+            "source_commit": launch_source_commit,
             "config_snapshot": config_snapshot(config),
             "train_protocol": {
                 "dataset": "PRCC train only",
@@ -168,7 +169,7 @@ def main():
                 "purpose": "fixed Original PDF epoch50 final checkpoint for train-only relation mining",
                 "checkpoint_path": checkpoint_path,
                 "checkpoint_sha256": sha256_file(checkpoint_path),
-                "source_commit": repo_commit(REPO_ROOT),
+                "source_commit": launch_source_commit,
                 "source_core_file_sha256": source_hashes(REPO_ROOT),
                 "training_seed": int(args.seed),
                 "epoch": 50,

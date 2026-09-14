@@ -244,6 +244,17 @@ def main():
     lines.append("")
     lines.append("每个正式 run 的 `metrics.csv` 逐 epoch 记录 raw/normalized weight mean/std/zero-rate、active-edge rate、raw relation loss、weighted relation loss、lambda contribution、total loss、gradient norm 与 ratio。active weight normalization 按 active edge mean 执行；zero edge 保持 0。")
     lines.append("")
+    lines.append("| Seed0 run | raw mean | raw std | raw zero | norm mean | active norm mean | active rate | weighted relation | lambda/total |")
+    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+    for run_id in SEED0:
+        rows_metrics = read_metrics(os.path.join(by_key[(0, run_id)]["path"], "metrics.csv"))
+        item = rows_metrics[-1] if rows_metrics else {}
+        lines.append("| {} | {} | {} | {} | {} | {} | {} | {} | {} |".format(
+            run_id, item.get("raw_weight_mean", "n/a"), item.get("raw_weight_std", "n/a"),
+            item.get("raw_weight_zero_rate", "n/a"), item.get("normalized_weight_mean", "n/a"),
+            item.get("normalized_active_weight_mean", "n/a"), item.get("active_edge_rate", "n/a"),
+            item.get("weighted_relation_loss_before_lambda", "n/a"), item.get("lambda_over_total", "n/a")))
+    lines.append("")
     lines.append("## 6. Metadata-matched random negative validation")
     lines.append("")
     lines.append(json_code({name: negative_sets.get(name) for name in ("matched_random", "visual", "semantic", "hybrid") if name in negative_sets}))

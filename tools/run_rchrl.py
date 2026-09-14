@@ -41,6 +41,7 @@ from tools.rchrl_common import (
     ATTRIBUTES, DATA_ROOT, ORIGINAL_CAPTION, REPO_ROOT, TrainCaptionDataset,
     config_snapshot, feature_transform, json_dump, load_train_records,
     image_io_path, repo_commit, set_all_seeds, sha256_file, source_hashes,
+    projected_image_cls,
 )
 from train import tokenize as pdf_tokenize
 
@@ -515,7 +516,7 @@ def train_one_epoch(config, model, criterion_cla, criterion_pair, optimizer,
                                for x in rel_batch[6:13]]
             # Keep scalar indices on CPU for coverage diagnostics.
             with torch.cuda.amp.autocast():
-                rel_features = model.module.encode_image(rel_imgs).float()
+                rel_features = projected_image_cls(model.module, rel_imgs).float()
                 rel_features = rel_features.chunk(3, dim=0)
                 rel = relation_loss(rel_features[0], rel_features[1], rel_features[2], rel_batch, spec)
         else:
@@ -717,7 +718,18 @@ def run_training(args, phase):
     eval_rows = []
     best_diff = -1.0
     best_epoch = None
-    max_epoch = config.TRAIN.MAX_EPOCH if phase == "train" else 1
+    # Smoke must cover a real five-minute training window.  Using one epoch
+    # here would silently pass on fast local storage (one epoch is well under
+    # five minutes), so allow enough epochs and pass the remaining global
+    # duration into each epoch below.  Sanity intentionally remains one
+    # epoch because its zero-second duration is checked after the first real
+    # optimizer step.
+    if phase == "train":
+        max_epoch = config.TRAIN.MAX_EPOCH
+    elif phase == "smoke":
+        max_epoch = 1000000
+    else:
+        max_epoch = 1
     smoke_duration = args.duration if phase in ("smoke", "sanity") else None
     start = time.time()
     for epoch in range(max_epoch):
@@ -725,10 +737,14 @@ def run_training(args, phase):
         if relation_sampler is not None:
             relation_sampler.set_epoch(epoch)
             relation_dataset.set_epoch(epoch)
+        if phase == "smoke":
+            epoch_duration = max(0.0, smoke_duration - (time.time() - start))
+        else:
+            epoch_duration = smoke_duration
         row = train_one_epoch(config, model, criterion_cla, criterion_pair,
                               optimizer, trainloader, relation_loader,
                               relation_sampler, relation_dataset, spec, epoch,
-                              logger, smoke_duration)
+                              logger, epoch_duration)
         scheduler.step()
         rows.append(row)
         if phase == "train" and (epoch + 1) % config.TEST.EVAL_STEP == 0 or \

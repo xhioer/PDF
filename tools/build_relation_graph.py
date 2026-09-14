@@ -27,7 +27,7 @@ from tools.rchrl_common import (
     P2_VALIDATION, REPO_ROOT, ImagePathDataset, distribution,
     feature_transform, json_dump, jsonl_write, load_p2_cache,
     load_train_records, p2_phrase, repo_commit, sha256_file, stable_hash,
-    TRAIN_ROOT,
+    projected_image_cls, TRAIN_ROOT,
 )
 
 
@@ -121,7 +121,7 @@ def extract_visual_features(model, records, device):
     with torch.no_grad():
         for images, indices in loader:
             images = images.to(device=device, non_blocking=True)
-            batch = model.encode_image(images).float()
+            batch = projected_image_cls(model, images).float()
             batch = torch.nn.functional.normalize(batch, dim=1)
             features[indices.numpy()] = batch.cpu().numpy()
     return features
@@ -399,7 +399,7 @@ def build_graph(checkpoint_path, output_dir):
     # Build integer bitset indexes for deterministic pseudo-random controls.
     # They make the 20-control match per anchor cheap without scanning all
     # 17,896 images for every relation.
-    metadata_index = {"all": (1 << len(records)), "camera_state": defaultdict(int),
+    metadata_index = {"all": ((1 << len(records)) - 1), "camera_state": defaultdict(int),
                       "attribute": defaultdict(int), "person": defaultdict(int)}
     for idx, row in enumerate(records):
         bit = 1 << idx

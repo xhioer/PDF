@@ -14,7 +14,8 @@ from configs.default_img import _C
 from models.clip_model import build_CLIP_from_openai_pretrained
 from tools.rchrl_common import (ImagePathDataset, REPO_ROOT, feature_transform,
                                  image_io_path, json_dump, load_train_records,
-                                 sha256_file, stable_hash)
+    sha256_file, stable_hash)
+from tools.rchrl_common import projected_image_cls
 
 
 CORE_PATHS = {
@@ -46,7 +47,7 @@ def extract_features(model, records, device):
     with torch.no_grad():
         for images, indices in loader:
             values = torch.nn.functional.normalize(
-                model.encode_image(images.to(device, non_blocking=True)).float(), dim=1)
+                projected_image_cls(model, images.to(device, non_blocking=True)).float(), dim=1)
             result[indices.numpy()] = values.cpu().numpy()
     return result
 
