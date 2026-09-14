@@ -259,7 +259,7 @@ def _choose_bit(mask, anchor_path, slot, count):
 
 
 def choose_matched_negative(anchor_idx, target_idx, slot, records, semantic,
-                            metadata_index):
+                            metadata_index, exclude_indices=()):
     anchor = records[anchor_idx]
     target = records[target_idx]
     target_overlap = tuple(bool(semantic[target["path"]][attr] != "unknown" and
@@ -271,6 +271,10 @@ def choose_matched_negative(anchor_idx, target_idx, slot, records, semantic,
     prefixes = [4, 3, 2, 1, 0]
     chosen = None
     used = None
+    excluded = metadata_index["person"].get(anchor["person_id"], 0)
+    excluded |= 1 << int(target_idx)
+    for index in exclude_indices:
+        excluded |= 1 << int(index)
     for prefix in prefixes:
         mask = metadata_index["camera_state"].get(
             (target["camera"], target["clothes_state"]), 0)
@@ -283,7 +287,7 @@ def choose_matched_negative(anchor_idx, target_idx, slot, records, semantic,
                 mask &= exact
             else:
                 mask &= ~exact
-        mask &= ~metadata_index["person"].get(anchor["person_id"], 0)
+        mask &= ~excluded
         candidate = _choose_bit(mask, anchor["path"], slot, len(records))
         if candidate is not None:
             chosen = candidate
@@ -292,7 +296,7 @@ def choose_matched_negative(anchor_idx, target_idx, slot, records, semantic,
     if chosen is None:
         # This fallback remains different-ID and is deterministic.  It should
         # be unreachable on PRCC but is retained as an explicit audit state.
-        mask = metadata_index["all"] & ~metadata_index["person"].get(anchor["person_id"], 0)
+        mask = metadata_index["all"] & ~excluded
         chosen = _choose_bit(mask, anchor["path"], slot, len(records))
         used = -1
     levels = {
@@ -416,9 +420,11 @@ def build_graph(checkpoint_path, output_dir):
     for anchor_idx in range(len(records)):
         anchor = records[anchor_idx]
         hybrid_order = [row["negative_index"] for row in hybrid_edges[anchor_idx * K:(anchor_idx + 1) * K]]
+        chosen_controls = set()
         for slot, target_idx in enumerate(hybrid_order):
             chosen, level = choose_matched_negative(anchor_idx, target_idx, slot, records,
-                                                     semantic, metadata_index)
+                                                     semantic, metadata_index, chosen_controls)
+            chosen_controls.add(chosen)
             matched_indices[anchor_idx, slot] = chosen
             match_levels[level] += 1
             vcos = float(np.dot(visual_features[anchor_idx], visual_features[chosen]))
@@ -586,6 +592,8 @@ def build_graph(checkpoint_path, output_dir):
         "negative_sets": negative_stats,
         "semantic_confuser_analysis": semantic_stats,
         "semantic_representation": semantic_meta,
+        "semantic_zero_feature_count": int(np.sum(np.linalg.norm(semantic_features, axis=1) == 0.0)),
+        "semantic_zero_feature_rate": float(np.mean(np.linalg.norm(semantic_features, axis=1) == 0.0)),
         "p2_cache_validation": validation,
         "v0_checkpoint_sha256": checkpoint_hash,
         "v0_checkpoint_path": checkpoint_path,
