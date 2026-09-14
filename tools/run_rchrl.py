@@ -831,9 +831,10 @@ def main():
     parser.add_argument("--duration", type=float, default=300.0)
     args = parser.parse_args()
     if args.phase == "sanity":
-        # A zero-second duration is checked after the first real optimizer
-        # step, so this remains an actual forward/backward/AMP update.
-        args.duration = 0.0
+        # The first real AMP batch can overflow at GradScaler's initial scale
+        # on this accelerator.  Run a short real window so the unchanged
+        # scaler can adapt, and require a later successful update in the gate.
+        args.duration = 30.0
         run_training(args, "sanity")
     else:
         run_training(args, args.phase)
