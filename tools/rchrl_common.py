@@ -27,7 +27,13 @@ TRAIN_ROOT = os.path.join(DATA_ROOT, "prcc", "rgb", "train")
 P2_CACHE = "/data/projects/ccreid-semantic-consistency-exp0/outputs/exp1_full_prcc_mllm/qwen3vl32b_p2_17896images.jsonl"
 P2_RULES = "/data/projects/ccreid-semantic-consistency-exp0/configs/normalization_rules_v2.json"
 P2_VALIDATION = "/data/projects/PDF-worktrees/pdf-reliability-ablation/reports/prcc_semantic_cache_validation.json"
-ORIGINAL_CAPTION = os.path.join(REPO_ROOT, "data", "captions", "prcc.json")
+# Confirmatory runs may pin the original PDF caption file by absolute path so
+# the protocol snapshot is byte-for-byte comparable across worktrees.  The
+# default remains the local repository copy for ordinary RCHRL-V1 runs.
+ORIGINAL_CAPTION = os.environ.get(
+    "RCHRL_ORIGINAL_CAPTION",
+    os.path.join(REPO_ROOT, "data", "captions", "prcc.json"),
+)
 LOCAL_IO_ROOT = os.environ.get("RCHRL_LOCAL_PRCC_ROOT", "")
 ATTRIBUTES = ("gender", "hair_color", "hair_length", "body_build")
 CONFIDENCE_VALUES = {"high": 1.0, "medium": 0.5, "low": 0.0, "unknown": 0.0}
