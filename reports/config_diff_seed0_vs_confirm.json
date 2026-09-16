@@ -1,0 +1,194 @@
+{
+  "allowed_differences": [
+    "seed",
+    "output path",
+    "master port (launcher metadata only)"
+  ],
+  "config_snapshots": {
+    "R00": {
+      "current_normalized": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+      "match_except_seed_output": true,
+      "previous_normalized": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n"
+    },
+    "R02": {
+      "current_normalized": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+      "match_except_seed_output": true,
+      "previous_normalized": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n"
+    },
+    "R08": {
+      "current_normalized": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+      "match_except_seed_output": true,
+      "previous_normalized": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n"
+    }
+  },
+  "confirm_root": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm",
+  "confirm_worktree": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm",
+  "core_file_sha256_current": {
+    "configs/default_img.py": "c0346fcff462764c6c435bde0413bffa476b52caf3b0e3e5eeac608beb5aa6ea",
+    "data/__init__.py": "31461a5e5b4c95f984c4aa3d38e6788af53c761b010d8a5f0fc68d1b5e990c0d",
+    "data/dataset_loader.py": "d6531d92c5e77e15e607e43265c202170f49871b4af9340689c96aa4f835a457",
+    "losses/contrastive_loss.py": "1e4e642b86f6d9ff3b95fe74f422d360c2818a809d9ab0ee7046e93c727e5c3a",
+    "losses/orthogonal_loss.py": "92ae5fc3771f84a4a58670805d34059df4231d47d71db2a770b451b73166ac8b",
+    "models/clip_model.py": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+    "test.py": "60db35dd7cbcdbb72caa70a9ac6e6036f847616707014e549c93359690388ef1",
+    "train.py": "756fbaa194f9a8f707004bd843077380ce66d1609b5cc64fdde1f8f6e9406a8c"
+  },
+  "diffs": {},
+  "experiment": "RCHRL-V1 Confirmatory Round",
+  "graph": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/relation_graph",
+  "graph_ledger_comparisons": {
+    "R00": {
+      "current": {
+        "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+        "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+        "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+        "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+        "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+        "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+        "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+        "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+        "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+        "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+        "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+      },
+      "match": true,
+      "previous": {
+        "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+        "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+        "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+        "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+        "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+        "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+        "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+        "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+        "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+        "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+        "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+      }
+    },
+    "R02": {
+      "current": {
+        "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+        "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+        "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+        "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+        "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+        "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+        "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+        "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+        "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+        "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+        "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+      },
+      "match": true,
+      "previous": {
+        "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+        "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+        "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+        "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+        "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+        "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+        "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+        "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+        "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+        "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+        "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+      }
+    },
+    "R08": {
+      "current": {
+        "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+        "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+        "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+        "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+        "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+        "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+        "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+        "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+        "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+        "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+        "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+      },
+      "match": true,
+      "previous": {
+        "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+        "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+        "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+        "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+        "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+        "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+        "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+        "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+        "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+        "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+        "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+      }
+    }
+  },
+  "previous_root": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1",
+  "previous_worktree": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1",
+  "run_specs": {
+    "R00": {
+      "current": {
+        "lambda": 0.0,
+        "name": "R00_control",
+        "negative": null,
+        "positive": "uniform",
+        "relation": "none",
+        "run_id": "R00"
+      },
+      "match": true,
+      "previous": {
+        "lambda": 0.0,
+        "name": "R00_control",
+        "negative": null,
+        "positive": "uniform",
+        "relation": "none",
+        "run_id": "R00"
+      }
+    },
+    "R02": {
+      "current": {
+        "lambda": 0.1,
+        "name": "R02_visualhard",
+        "negative": "visual",
+        "positive": "uniform",
+        "relation": "hinge",
+        "run_id": "R02"
+      },
+      "match": true,
+      "previous": {
+        "lambda": 0.1,
+        "name": "R02_visualhard",
+        "negative": "visual",
+        "positive": "uniform",
+        "relation": "hinge",
+        "run_id": "R02"
+      }
+    },
+    "R08": {
+      "current": {
+        "lambda": 0.1,
+        "name": "R08_visual_joint",
+        "negative": "visual",
+        "positive": "R_joint",
+        "relation": "hinge",
+        "run_id": "R08"
+      },
+      "match": true,
+      "previous": {
+        "lambda": 0.1,
+        "name": "R08_visual_joint",
+        "negative": "visual",
+        "positive": "R_joint",
+        "relation": "hinge",
+        "run_id": "R08"
+      }
+    }
+  },
+  "runner_match": true,
+  "runner_sha256_current": "674fe5e11b7a4c53b60084ccd57cb3c7f7edebff35186477540212616de18ca8",
+  "runner_sha256_previous": "674fe5e11b7a4c53b60084ccd57cb3c7f7edebff35186477540212616de18ca8",
+  "status": "pass",
+  "training_authorized": true
+}

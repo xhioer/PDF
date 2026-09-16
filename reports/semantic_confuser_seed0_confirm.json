@@ -1,0 +1,34 @@
+{
+  "feature_definition": "raw projected CLS encode_image, L2 normalized; no flip",
+  "fixed_anchor_count": 100,
+  "graph_relation_index": "outputs/crossclothes_relation_confirm/relation_graph/relation_index.npz",
+  "hybrid_top1": {
+    "count": 300,
+    "mean_delta": -0.0284915562470754,
+    "mean_rank_after": 221.66333333333333,
+    "mean_rank_before": 233.68,
+    "mean_similarity_after": 0.8321087954441706,
+    "mean_similarity_before": 0.860600351691246,
+    "rank_improved_fraction": 0.32
+  },
+  "hybrid_top1_graph_key": "hybrid_neg[:, 0]",
+  "missing": [],
+  "rows": 600,
+  "semantic_confusers": "frozen graph semantic_top1 and hybrid_top1 different-ID train negatives",
+  "semantic_top1": {
+    "count": 300,
+    "mean_delta": -0.0284915562470754,
+    "mean_rank_after": 221.66333333333333,
+    "mean_rank_before": 233.68,
+    "mean_similarity_after": 0.8321087954441706,
+    "mean_similarity_before": 0.860600351691246,
+    "rank_improved_fraction": 0.32
+  },
+  "semantic_top1_graph_key": "semantic_neg[:, 0]",
+  "test_data_used": false,
+  "top1_arrays_independent": true,
+  "top1_exact_match_all": 17499,
+  "top1_exact_match_first100": 100,
+  "top1_exact_match_rate_all": 0.9778162717925794,
+  "top1_exact_match_rate_first100": 1.0
+}

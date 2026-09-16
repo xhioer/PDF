@@ -1,0 +1,56 @@
+{
+  "checkpoint": "outputs/crossclothes_relation_confirm/frozen_inputs/epoch50_final.verified.pth",
+  "checks": {
+    "config_consistency": {
+      "diffs": {},
+      "pass": true,
+      "status": "pass"
+    },
+    "graph_ledger_equal_previous": {
+      "pass": true
+    },
+    "graph_ledger_sha256": {
+      "current": "70eaabec2641167ce12c1b06ecd134338becf7ccf25b018a73a4cb3f24310502",
+      "pass": true,
+      "previous": "70eaabec2641167ce12c1b06ecd134338becf7ccf25b018a73a4cb3f24310502"
+    },
+    "graph_manifest": {
+      "frozen": true,
+      "pass": true,
+      "test_data_used": false,
+      "train_id_count": 150,
+      "train_image_count": 17896,
+      "train_only": true
+    },
+    "p2_cache_sha256": {
+      "actual": "cd0aded0585c6af9f65451a7a05cb7a088601057600533fb2efd151d1275f20d",
+      "expected": "cd0aded0585c6af9f65451a7a05cb7a088601057600533fb2efd151d1275f20d",
+      "pass": true,
+      "path": "/data/projects/ccreid-semantic-consistency-exp0/outputs/exp1_full_prcc_mllm/qwen3vl32b_p2_17896images.jsonl"
+    },
+    "source_core_hashes": {
+      "configs/default_img.py": "c0346fcff462764c6c435bde0413bffa476b52caf3b0e3e5eeac608beb5aa6ea",
+      "data/__init__.py": "31461a5e5b4c95f984c4aa3d38e6788af53c761b010d8a5f0fc68d1b5e990c0d",
+      "data/dataset_loader.py": "d6531d92c5e77e15e607e43265c202170f49871b4af9340689c96aa4f835a457",
+      "losses/contrastive_loss.py": "1e4e642b86f6d9ff3b95fe74f422d360c2818a809d9ab0ee7046e93c727e5c3a",
+      "losses/orthogonal_loss.py": "92ae5fc3771f84a4a58670805d34059df4231d47d71db2a770b451b73166ac8b",
+      "models/clip_model.py": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+      "pass": true,
+      "test.py": "60db35dd7cbcdbb72caa70a9ac6e6036f847616707014e549c93359690388ef1",
+      "train.py": "756fbaa194f9a8f707004bd843077380ce66d1609b5cc64fdde1f8f6e9406a8c"
+    },
+    "v0_checkpoint_sha256": {
+      "actual": "25c4a763fa8fab0b70e69207969312fddbb2e547f27281b83e20741c8f3272a3",
+      "expected": "25c4a763fa8fab0b70e69207969312fddbb2e547f27281b83e20741c8f3272a3",
+      "pass": true,
+      "path": "outputs/crossclothes_relation_confirm/frozen_inputs/epoch50_final.verified.pth"
+    }
+  },
+  "current_graph": "outputs/crossclothes_relation_confirm/relation_graph",
+  "experiment": "RCHRL-V1 Confirmatory Round",
+  "no_graph_remining": true,
+  "previous_graph": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/relation_graph",
+  "status": "pass",
+  "test_data_used_for_preflight": false,
+  "training_authorized": true
+}

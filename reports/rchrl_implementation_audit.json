@@ -1,0 +1,35 @@
+{
+  "audit_status": "pass",
+  "base_commit": "4eb619dca59a922fd28bc0891e8c3066e7186841",
+  "branch": "pdf-crossclothes-relation-confirm",
+  "core_file_sha256": {
+    "configs/default_img.py": "c0346fcff462764c6c435bde0413bffa476b52caf3b0e3e5eeac608beb5aa6ea",
+    "data/__init__.py": "31461a5e5b4c95f984c4aa3d38e6788af53c761b010d8a5f0fc68d1b5e990c0d",
+    "data/dataset_loader.py": "d6531d92c5e77e15e607e43265c202170f49871b4af9340689c96aa4f835a457",
+    "losses/contrastive_loss.py": "1e4e642b86f6d9ff3b95fe74f422d360c2818a809d9ab0ee7046e93c727e5c3a",
+    "losses/orthogonal_loss.py": "92ae5fc3771f84a4a58670805d34059df4231d47d71db2a770b451b73166ac8b",
+    "models/clip_model.py": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+    "test.py": "60db35dd7cbcdbb72caa70a9ac6e6036f847616707014e549c93359690388ef1",
+    "train.py": "756fbaa194f9a8f707004bd843077380ce66d1609b5cc64fdde1f8f6e9406a8c"
+  },
+  "core_files_changed_since_base": [],
+  "dynamic_remining": false,
+  "experiment": "RCHRL-V1",
+  "forbidden_feature_code_hits": {},
+  "image_only_inference_unchanged": true,
+  "notes": [
+    "V0 runner does not instantiate PRCC test/val metadata and does not import evaluator.",
+    "Graph builder consumes only PRCC TRAIN paths and the four P2 attributes/confidences.",
+    "Formal runner imports the unchanged evaluator only at evaluation time."
+  ],
+  "p2_cache_lines": 17896,
+  "p2_cache_path": "/data/projects/ccreid-semantic-consistency-exp0/outputs/exp1_full_prcc_mllm/qwen3vl32b_p2_17896images.jsonl",
+  "p2_cache_sha256": "cd0aded0585c6af9f65451a7a05cb7a088601057600533fb2efd151d1275f20d",
+  "p2_normalization_rules_path": "/data/projects/ccreid-semantic-consistency-exp0/configs/normalization_rules_v2.json",
+  "p2_normalization_rules_sha256": "94fb3a50f14ef09017d858e9ed036819ee10a416270c1ef164c576e09925cd65",
+  "p2_validation_passed": true,
+  "p2_validation_report": "/data/projects/PDF-worktrees/pdf-reliability-ablation/reports/prcc_semantic_cache_validation.json",
+  "source_commit": "fe2eba095b5b1488d05aef723abe322ca83b867b",
+  "test_data_in_relation_graph_or_mining": false,
+  "worktree": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm"
+}

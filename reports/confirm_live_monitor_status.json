@@ -1,0 +1,111 @@
+{
+  "active_run_count": 0,
+  "completed_count": 6,
+  "experiment": "RCHRL-V1 Confirmatory Round",
+  "runs": [
+    {
+      "active_pids": [],
+      "final_checkpoint": true,
+      "last_progress": {
+        "epoch": 50,
+        "line": "2026-09-16 02:59:32,302 epoch 50 [260/271] base 5.0720 rel 0.0000 total 5.0720",
+        "step": 260,
+        "steps_per_epoch": 271
+      },
+      "log_mtime": 1789498811.0,
+      "output": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed1/R00",
+      "run_id": "R00",
+      "seconds_since_log_update": 35975.17530012131,
+      "seed": 1,
+      "stalled_warning": false,
+      "state": "complete"
+    },
+    {
+      "active_pids": [],
+      "final_checkpoint": true,
+      "last_progress": {
+        "epoch": 50,
+        "line": "2026-09-16 05:08:53,267 epoch 50 [260/271] base 5.0675 rel 0.2347 total 5.0910",
+        "step": 260,
+        "steps_per_epoch": 271
+      },
+      "log_mtime": 1789506579.0,
+      "output": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed1/R02",
+      "run_id": "R02",
+      "seconds_since_log_update": 28207.175300121307,
+      "seed": 1,
+      "stalled_warning": false,
+      "state": "complete"
+    },
+    {
+      "active_pids": [],
+      "final_checkpoint": true,
+      "last_progress": {
+        "epoch": 50,
+        "line": "2026-09-16 06:10:08,549 epoch 50 [260/271] base 5.0676 rel 0.2324 total 5.0908",
+        "step": 260,
+        "steps_per_epoch": 271
+      },
+      "log_mtime": 1789510255.0,
+      "output": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed1/R08",
+      "run_id": "R08",
+      "seconds_since_log_update": 24531.175300121307,
+      "seed": 1,
+      "stalled_warning": false,
+      "state": "complete"
+    },
+    {
+      "active_pids": [],
+      "final_checkpoint": true,
+      "last_progress": {
+        "epoch": 50,
+        "line": "2026-09-16 06:08:05,165 epoch 50 [260/271] base 5.0613 rel 0.0000 total 5.0613",
+        "step": 260,
+        "steps_per_epoch": 271
+      },
+      "log_mtime": 1789510124.0,
+      "output": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed2/R00",
+      "run_id": "R00",
+      "seconds_since_log_update": 24662.175300121307,
+      "seed": 2,
+      "stalled_warning": false,
+      "state": "complete"
+    },
+    {
+      "active_pids": [],
+      "final_checkpoint": true,
+      "last_progress": {
+        "epoch": 50,
+        "line": "2026-09-16 09:17:35,145 epoch 50 [260/271] base 5.0603 rel 0.2372 total 5.0840",
+        "step": 260,
+        "steps_per_epoch": 271
+      },
+      "log_mtime": 1789521501.0,
+      "output": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed2/R02",
+      "run_id": "R02",
+      "seconds_since_log_update": 13285.175300121307,
+      "seed": 2,
+      "stalled_warning": false,
+      "state": "complete"
+    },
+    {
+      "active_pids": [],
+      "final_checkpoint": true,
+      "last_progress": {
+        "epoch": 50,
+        "line": "2026-09-16 09:21:21,154 epoch 50 [260/271] base 5.0605 rel 0.2354 total 5.0840",
+        "step": 260,
+        "steps_per_epoch": 271
+      },
+      "log_mtime": 1789521727.0,
+      "output": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed2/R08",
+      "run_id": "R08",
+      "seconds_since_log_update": 13059.175300121307,
+      "seed": 2,
+      "stalled_warning": false,
+      "state": "complete"
+    }
+  ],
+  "timestamp": 1789534786.1753001,
+  "warnings": []
+}
