@@ -1,0 +1,69 @@
+{
+  "created_utc": "2026-09-14T15:07:50Z",
+  "estimated_all_24_two_device_lower_bound_hours": 35.56690649614112,
+  "estimated_all_24_two_device_relation_wave_hours": 35.65346082454631,
+  "estimated_formal_run_hours": {
+    "R00": {
+      "estimated_evaluation_seconds": 435.0,
+      "estimated_formal_run_hours": 1.0227050181706745,
+      "estimated_formal_run_seconds": 3681.7380654144285,
+      "estimated_training_seconds": 3246.7380654144285
+    },
+    "R04": {
+      "estimated_evaluation_seconds": 435.0,
+      "estimated_formal_run_hours": 3.2412237113223914,
+      "estimated_formal_run_seconds": 11668.40536076061,
+      "estimated_training_seconds": 11233.40536076061
+    }
+  },
+  "estimated_seed0_two_device_hours": 25.92978969057913,
+  "experiment": "RCHRL-V1",
+  "gate_decision": "exceeds_18h",
+  "gate_time_hours": 18.0,
+  "priority_1": "seed0 R00-R15",
+  "priority_2": "seed1 R00/R04/R07/R11",
+  "priority_3": "seed2 R00/R04/R07/R11",
+  "protocol_batches_per_epoch": 271,
+  "protocol_epochs": 50,
+  "queue_policy": "fixed priority: seed0 R00-R15, then seed1 core, then seed2 core; at the 18h gate stop claiming new tasks and let active tasks finish",
+  "smoke_inputs": {
+    "R00": {
+      "amp_overflow_steps": 18,
+      "checkpoint_write": true,
+      "duration_seconds": 346.01947355270386,
+      "evaluation_feature_shape": [
+        3384,
+        512
+      ],
+      "finite": true,
+      "gradient_finite_rate": 0.9856,
+      "images_per_sec": 231.2006364160356,
+      "iterations": 1250,
+      "nonfinite_gradient_steps": 18,
+      "peak_memory_bytes": 9833007616,
+      "phase": "smoke",
+      "required_duration_seconds": 300.0,
+      "sec_per_iter": 0.23961166534423828,
+      "successful_optimizer_steps": 1232
+    },
+    "R04": {
+      "amp_overflow_steps": 9,
+      "checkpoint_write": true,
+      "duration_seconds": 347.4368598461151,
+      "evaluation_feature_shape": [
+        3384,
+        512
+      ],
+      "finite": true,
+      "gradient_finite_rate": 0.9751381215469613,
+      "images_per_sec": 66.68255331844077,
+      "iterations": 362,
+      "nonfinite_gradient_steps": 9,
+      "peak_memory_bytes": 33331377664,
+      "phase": "smoke",
+      "required_duration_seconds": 300.0,
+      "sec_per_iter": 0.8290336059601926,
+      "successful_optimizer_steps": 353
+    }
+  }
+}

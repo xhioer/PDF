@@ -1,0 +1,68 @@
+{
+  "checks": {
+    "feature_norms": {
+      "semantic_nonzero_l2": true,
+      "semantic_zero_vectors": 4,
+      "visual_l2": true
+    },
+    "hybrid_neg": {
+      "different_id": true,
+      "range_valid": true,
+      "shape": [
+        17896,
+        20
+      ],
+      "unique_per_anchor": true
+    },
+    "matched_neg": {
+      "different_id": true,
+      "range_valid": true,
+      "shape": [
+        17896,
+        20
+      ],
+      "unique_per_anchor": true
+    },
+    "positive": {
+      "directed_count": 1002080,
+      "same_id_different_clothes_ac_bc_only": true
+    },
+    "semantic_neg": {
+      "different_id": true,
+      "range_valid": true,
+      "shape": [
+        17896,
+        20
+      ],
+      "unique_per_anchor": true
+    },
+    "visual_neg": {
+      "different_id": true,
+      "range_valid": true,
+      "shape": [
+        17896,
+        20
+      ],
+      "unique_per_anchor": true
+    }
+  },
+  "experiment": "RCHRL-V1",
+  "graph_dir": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/relation_graph",
+  "manifest_frozen": true,
+  "manifest_test_data_used": false,
+  "manifest_train_only": true,
+  "payload_sha256": {
+    "hybrid_hard_negative_edges.jsonl": "60d2077ad7274e29ad315afa556706496feb9025e453797890c794fd298c7a1a",
+    "matched_random_negative_edges.jsonl": "a613911687b32cd888e44d928c98fe0314c55ad4eb7d168d284baf42d5a693d4",
+    "positive_edges.jsonl": "cfeb9713a12fedc6504c035a768442c6ecb4364920f095e92e0982b503113761",
+    "relation_graph_manifest.json": "328c3ec1302a1019b064afec2741989ceea7f5e82c9a8f394566cfd1e6e7c9be",
+    "relation_graph_stats.json": "6953d890031f22a33fce2440c2f8850fd1dec43686a6158237ef0e225312ec31",
+    "relation_index.npz": "33d0ebaf424e88992e35d6f3c4dbc0640d2320f8215609230bcf77620f0a7221",
+    "semantic_features.npy": "74f1df745fc6d8b53d5c55cf7404dad952825559a842eb73ad28deaff9adf320",
+    "semantic_hard_negative_edges.jsonl": "e02e7c3afd8795469cb976879aebbddabe25fbb4fcea4ff3ca33ce7b394fbf23",
+    "train_image_manifest.jsonl": "8f3eba7902b55942a981a4a183f18bc2bf329a4a1a9169f2de33cd9e3e5d4a8c",
+    "visual_features.npy": "ce006d511ea494eea0ef64f43b28f47e2bb3724d40728584f3d471393268ea43",
+    "visual_hard_negative_edges.jsonl": "705e0a8d65adb0babcafb25af11bc8a89f0c2f179a88f8caad3d3d46f727c961"
+  },
+  "verification": "verify_frozen_graph plus train-index structural validation passed"
+}

@@ -1,0 +1,67 @@
+{
+  "feature_definition": "raw projected CLS encode_image, L2 normalized; no flip",
+  "fixed_anchor_count": 100,
+  "hybrid_top1": {
+    "count": 400,
+    "mean_delta": -0.06965050905942917,
+    "mean_rank_after": 236.4125,
+    "mean_rank_before": 233.68,
+    "mean_similarity_after": 0.7909498426318169,
+    "mean_similarity_before": 0.860600351691246,
+    "rank_improved_fraction": 0.6425
+  },
+  "missing": [
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed1/R00/epoch50_final.pth",
+      "run_id": "R00",
+      "seed": 1
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed1/R04/epoch50_final.pth",
+      "run_id": "R04",
+      "seed": 1
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed1/R07/epoch50_final.pth",
+      "run_id": "R07",
+      "seed": 1
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed1/R11/epoch50_final.pth",
+      "run_id": "R11",
+      "seed": 1
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed2/R00/epoch50_final.pth",
+      "run_id": "R00",
+      "seed": 2
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed2/R04/epoch50_final.pth",
+      "run_id": "R04",
+      "seed": 2
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed2/R07/epoch50_final.pth",
+      "run_id": "R07",
+      "seed": 2
+    },
+    {
+      "checkpoint": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed2/R11/epoch50_final.pth",
+      "run_id": "R11",
+      "seed": 2
+    }
+  ],
+  "rows": 800,
+  "semantic_confusers": "frozen graph semantic_top1 and hybrid_top1 different-ID train negatives",
+  "semantic_top1": {
+    "count": 400,
+    "mean_delta": -0.06965050905942917,
+    "mean_rank_after": 236.4125,
+    "mean_rank_before": 233.68,
+    "mean_similarity_after": 0.7909498426318169,
+    "mean_similarity_before": 0.860600351691246,
+    "rank_improved_fraction": 0.6425
+  },
+  "test_data_used": false
+}

@@ -1,0 +1,57 @@
+{
+  "checkpoint_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/v0_mining/epoch50_final.verified.pth",
+  "checkpoint_sha256": "25c4a763fa8fab0b70e69207969312fddbb2e547f27281b83e20741c8f3272a3",
+  "config_snapshot": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nOUTPUT: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/v0_mining\nSEED: 0\nTAG: v0_mining_epoch50_final\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+  "epoch": 50,
+  "experiment": "RCHRL-V1",
+  "no_test_adaptive_checkpoint_selection_was_used_for_relation_mining": true,
+  "provenance_correction": "verified copy created with the exact launch commit; model state unchanged",
+  "purpose": "fixed Original PDF epoch50 final checkpoint for train-only relation mining",
+  "raw_checkpoint_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/v0_mining/epoch50_final.pth",
+  "raw_checkpoint_sha256": "16483fdbf93e3d1c9539f17020c7d8401241070ac4499bdce8c75510dc7738c7",
+  "source_commit": "8745c8adfa035bcfebe88b6653faedd88e529080",
+  "source_commit_at_launch": "8745c8adfa035bcfebe88b6653faedd88e529080",
+  "source_core_file_sha256": {
+    "configs/default_img.py": "c0346fcff462764c6c435bde0413bffa476b52caf3b0e3e5eeac608beb5aa6ea",
+    "data/__init__.py": "31461a5e5b4c95f984c4aa3d38e6788af53c761b010d8a5f0fc68d1b5e990c0d",
+    "data/dataset_loader.py": "d6531d92c5e77e15e607e43265c202170f49871b4af9340689c96aa4f835a457",
+    "losses/contrastive_loss.py": "1e4e642b86f6d9ff3b95fe74f422d360c2818a809d9ab0ee7046e93c727e5c3a",
+    "losses/orthogonal_loss.py": "92ae5fc3771f84a4a58670805d34059df4231d47d71db2a770b451b73166ac8b",
+    "models/clip_model.py": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+    "test.py": "60db35dd7cbcdbb72caa70a9ac6e6036f847616707014e549c93359690388ef1",
+    "train.py": "756fbaa194f9a8f707004bd843077380ce66d1609b5cc64fdde1f8f6e9406a8c"
+  },
+  "test_adaptive_checkpoint_selection": false,
+  "test_captions_loaded_during_training": false,
+  "test_features_loaded_during_training": false,
+  "test_metadata_loaded_during_training": false,
+  "test_metrics_loaded_during_training": false,
+  "train_inventory": {
+    "ids": 150,
+    "images": 17896
+  },
+  "train_only": true,
+  "train_protocol": {
+    "amp_grad_scaler": true,
+    "backbone": "ViT-B/16",
+    "batch": 64,
+    "dataset": "PRCC TRAIN",
+    "epochs": 50,
+    "gamma": 0.1,
+    "loss_family": "current Original PDF L_PDF",
+    "lr": 3.5e-07,
+    "milestones": [
+      20,
+      40
+    ],
+    "optimizer": "Adam",
+    "primary_checkpoint": "epoch50_final.pth",
+    "relation_loss": null,
+    "resolution": "384x128",
+    "same_augmentation": true,
+    "weight_decay": 0.0005,
+    "world": 1
+  },
+  "training_seed": 0,
+  "wall_clock_seconds": 2320.2908737659454
+}
