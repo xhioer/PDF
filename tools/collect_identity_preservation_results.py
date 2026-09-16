@@ -108,6 +108,7 @@ def old_results(candidates):
 def main(args):
     root = Path(args.output_root)
     reports = Path(args.reports)
+    repo_root = Path(__file__).resolve().parents[1]
     reports.mkdir(parents=True, exist_ok=True)
     all_rows = [load_status(root, variant, seed) for variant, seed in queue_tasks()]
     write_csv(reports / 'identity_preservation_run_status.csv', all_rows)
@@ -185,7 +186,7 @@ def main(args):
 
     old_candidates = [
         Path(args.old_results),
-        ROOT / 'reports/pdf_reliability_ablation.csv',
+        repo_root / 'reports/pdf_reliability_ablation.csv',
         Path('/data/projects/PDF-worktrees/pdf-reliability-ablation/reports/pdf_reliability_ablation.csv'),
         Path('/data/outputs/PDF/reports/pdf_reliability_ablation.csv'),
     ]
@@ -262,7 +263,19 @@ def main(args):
             classification_reason = 'identity-preservation 机制有收益或更合理的 decomposition 证据，但相对旧 EOT additive 的明显优势或 reliability 稳定增益不足。'
     elif robust_new and any(row[1] > 0 and row[2] > 0 for row in robust_new):
         classification = 'B'
-        classification_reason = 'identity-preservation 机制相对 control 有效，但 matched seeds 尚不足以支持可靠性策略的稳定额外收益。'
+        n09_row = next((row for row in robust_new if row[0] == 'N09'), None)
+        n16_row = next((row for row in robust_new if row[0] == 'N16'), None)
+        n09_multi = next((row for row in multiseed_rows if row['Variant'] == 'N09'), None)
+        n16_multi = next((row for row in multiseed_rows if row['Variant'] == 'N16'), None)
+        classification_reason = 'identity-preservation 有限正向证据：N09 matched Diff R1 Δ={}±{} pp、Diff mAP Δ={}±{} pp；N16 joint matched Diff mAP Δ={}±{} pp、R1 Δ={}±{} pp。整体支持继续验证，但不支持广泛或明显的 reliability 增益。'.format(
+            fmt(n09_row[1]) if n09_row else 'n/a',
+            fmt(statistics.stdev(n09_row[3])) if n09_row and len(n09_row[3]) >= 2 else 'n/a',
+            fmt(n09_row[2]) if n09_row else 'n/a',
+            fmt(float(n09_multi['Delta_Diff_mAP_std'])) if n09_multi and n09_multi.get('Delta_Diff_mAP_std') not in ('', None) else 'n/a',
+            fmt(n16_row[2]) if n16_row else 'n/a',
+            fmt(float(n16_multi['Delta_Diff_mAP_std'])) if n16_multi and n16_multi.get('Delta_Diff_mAP_std') not in ('', None) else 'n/a',
+            fmt(n16_row[1]) if n16_row else 'n/a',
+            fmt(statistics.stdev(n16_row[3])) if n16_row and len(n16_row[3]) >= 2 else 'n/a')
     elif seed_variance_dominant:
         classification = 'E'
         classification_reason = '效应量主要不超过 matched seed 标准差，当前不能支持新模块。'
@@ -276,6 +289,57 @@ def main(args):
     for row in multiseed_rows:
         if row.get('Same_R1_std') not in ('', None):
             same_stability.append((row['Variant'], float(row['Same_R1_mean']), float(row['Same_R1_std'])))
+
+    seed0_by_variant = {row['Variant']: row for row in seed0_rows}
+    multiseed_by_variant = {row['Variant']: row for row in multiseed_rows}
+
+    def seed0_number(variant, field):
+        value = seed0_by_variant.get(variant, {}).get(field)
+        return None if value in ('', None) else float(value)
+
+    def multiseed_number(variant, field):
+        value = multiseed_by_variant.get(variant, {}).get(field)
+        return None if value in ('', None) else float(value)
+
+    def show(value, digits=4):
+        return 'n/a' if value is None else fmt(value, digits)
+
+    sanity = {}
+    sanity_path = reports / 'identity_preservation_gradient_sanity.json'
+    if sanity_path.exists():
+        try:
+            sanity = read_json(sanity_path)
+        except Exception:
+            sanity = {}
+
+    q1_r1 = seed0_number('N01', 'Delta_Diff_R1')
+    q1_map = seed0_number('N01', 'Delta_Diff_mAP')
+    q2_best_r1 = max((seed0_number(v, 'Diff_R1') for v in ('N02', 'N03', 'N04')
+                      if seed0_number(v, 'Diff_R1') is not None), default=None)
+    q2_best_map = max((seed0_number(v, 'Diff_mAP') for v in ('N02', 'N03', 'N04')
+                       if seed0_number(v, 'Diff_mAP') is not None), default=None)
+    q2_raw_r1 = seed0_number('N01', 'Diff_R1')
+    q2_raw_map = seed0_number('N01', 'Diff_mAP')
+    q3_best = max((v for v in ('N05', 'N06', 'N07')
+                   if seed0_number(v, 'Diff_R1') is not None),
+                  key=lambda v: seed0_number(v, 'Diff_R1'), default=None)
+    q5_n12_r1 = seed0_number('N12', 'Delta_Diff_R1')
+    q5_n12_map = seed0_number('N12', 'Delta_Diff_mAP')
+    q5_n13_r1 = seed0_number('N13', 'Delta_Diff_R1')
+    q5_n13_map = seed0_number('N13', 'Delta_Diff_mAP')
+    n16_r1_deltas = [multiseed_number('N16', 'Delta_Diff_R1_seed{}'.format(seed)) for seed in (0, 1, 2)]
+    n16_map_deltas = [multiseed_number('N16', 'Delta_Diff_mAP_seed{}'.format(seed)) for seed in (0, 1, 2)]
+
+    old_table = []
+    for row in old_rows:
+        old_table.append('| {Variant} | {Semantic} | {AttributeReliability} | {ConfidenceReliability} | {Diff_R1} | {Diff_mAP} | {Same_R1} | {Same_mAP} |'.format(
+            Variant=row.get('Variant', ''), Semantic=row.get('Semantic', ''),
+            AttributeReliability=row.get('AttributeReliability', ''),
+            ConfidenceReliability=row.get('ConfidenceReliability', ''),
+            Diff_R1=show(float(row['Diff_R1'])) if row.get('Diff_R1') else 'n/a',
+            Diff_mAP=show(float(row['Diff_mAP'])) if row.get('Diff_mAP') else 'n/a',
+            Same_R1=show(float(row['Same_R1'])) if row.get('Same_R1') else 'n/a',
+            Same_mAP=show(float(row['Same_mAP'])) if row.get('Same_mAP') else 'n/a'))
 
     report_lines = [
         '# PDF Identity-Semantic Preservation V2 overnight report',
@@ -291,13 +355,21 @@ def main(args):
         '继续 identity-semantic preservation 方向：**{}**。'.format(
             'YES' if classification == 'A' else ('WEAK YES' if classification in ('B', 'C') else 'NO')),
         '',
-        '最有希望配置（按 matched multi-seed Different Clothes R1/mAP）：',
+        '最有希望配置（分别代表 R1 机制候选与 reliability/mAP 候选）：',
     ]
     if best_new:
         report_lines.append('- `{}`：Delta Diff R1 mean={} pp，Delta Diff mAP mean={} pp；matched R1 deltas={}。'.format(
             best_new[0], fmt(best_new[1]), fmt(best_new[2]), ', '.join(fmt(x) for x in best_new[3])))
-    if best_reliability:
-        report_lines.append('- `{}`：reliability 家族最佳，Delta Diff R1 mean={} pp，Delta Diff mAP mean={} pp。'.format(
+    if multiseed_by_variant.get('N16'):
+        report_lines.append('- `N16`：joint reliability；Delta Diff R1 mean={}±{} pp，Delta Diff mAP mean={}±{} pp；Same R1={}±{}。'.format(
+            show(multiseed_number('N16', 'Delta_Diff_R1_mean')),
+            show(multiseed_number('N16', 'Delta_Diff_R1_std')),
+            show(multiseed_number('N16', 'Delta_Diff_mAP_mean')),
+            show(multiseed_number('N16', 'Delta_Diff_mAP_std')),
+            show(multiseed_number('N16', 'Same_R1_mean')),
+            show(multiseed_number('N16', 'Same_R1_std'))))
+    elif best_reliability:
+        report_lines.append('- `{}`：reliability 家族当前最佳，Delta Diff R1 mean={} pp，Delta Diff mAP mean={} pp。'.format(
             best_reliability[0], fmt(best_reliability[1]), fmt(best_reliability[2])))
     if not best_new:
         report_lines.append('- 当前没有足够完整的 3-seed matched 结果。')
@@ -308,7 +380,13 @@ def main(args):
         '- tensor audit：见 [identity_preservation_tensor_audit.md](identity_preservation_tensor_audit.md)。',
         '- semantic cache：固定 full PRCC train 17,896/17,896；属性固定为 gender、hair_color、hair_length、body_build；epsilon=1e-6；未知属性权重为0；all-unknown sample 不进入 semantic loss 分母。',
         '- 原 caption clothing branch 保留；所有 V2 run 的 EOT additive guidance 为 OFF；没有新增 projection、attention、encoder、backbone、observation gate 或 OPL/triplet 修改。',
-        '- gradient sanity：见 [identity_preservation_gradient_sanity.json](identity_preservation_gradient_sanity.json)。',
+        '- gradient sanity：见 [identity_preservation_gradient_sanity.json](identity_preservation_gradient_sanity.json)；passed={}，四个 loss finite={}，image-only bitwise unchanged={}，visual trainable tensors={}，trainable parameter count before/after={}/{}。'.format(
+            sanity.get('passed', 'n/a'),
+            all(sanity.get('loss_finite', {}).values()) if sanity.get('loss_finite') else 'n/a',
+            sanity.get('image_only_bitwise_equal_with_semantic_argument', 'n/a'),
+            (sanity.get('gradient_checks', {}).get('L_rank', {}).get('visual_trainable_parameter_tensors', 'n/a')),
+            sanity.get('trainable_parameter_count_before', 'n/a'),
+            sanity.get('trainable_parameter_count_after', 'n/a')),
         '',
         '## 27 个实验完成状态',
         '',
@@ -321,26 +399,46 @@ def main(args):
         '',
         '见 [identity_preservation_seed0_ablation.csv](identity_preservation_seed0_ablation.csv)。主指标为 epoch50 final；best test checkpoint 只作为 run 内辅助诊断。',
         '',
-        '## Different Clothes 排名（seed0 epoch50 final，按 R1）',
-        '',
     ]
+    report_lines += [
+        '| Variant | Mechanism | Reliability | λraw | λpres | λexcl | λrank | margin | Diff R1 | Diff mAP | Same R1 | Same mAP | cos_res | cos_com | margin diagnostic |',
+        '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+    ]
+    for row in seed0_rows:
+        report_lines.append('| {Variant} | {Mechanism} | {Reliability} | {LambdaRaw} | {LambdaPres} | {LambdaExcl} | {LambdaRank} | {Margin} | {Diff_R1} | {Diff_mAP} | {Same_R1} | {Same_mAP} | {cos_res_sem} | {cos_com_sem} | {semantic_margin} |'.format(
+            Variant=row['Variant'], Mechanism=row['Mechanism'], Reliability=row['Reliability'],
+            LambdaRaw=show(float(row['LambdaRaw'])), LambdaPres=show(float(row['LambdaPres'])),
+            LambdaExcl=show(float(row['LambdaExcl'])), LambdaRank=show(float(row['LambdaRank'])),
+            Margin=show(float(row['Margin'])), Diff_R1=show(float(row['Diff_R1'])),
+            Diff_mAP=show(float(row['Diff_mAP'])), Same_R1=show(float(row['Same_R1'])),
+            Same_mAP=show(float(row['Same_mAP'])), cos_res_sem=show(float(row['cos_res_sem']), 6),
+            cos_com_sem=show(float(row['cos_com_sem']), 6),
+            semantic_margin=show(float(row['semantic_margin']), 6)))
+    report_lines += ['', '## Different Clothes 排名（seed0 epoch50 final，按 R1）', '']
     for index, row in enumerate(ranking, 1):
         report_lines.append('{}. `{}`：R1={}，mAP={}；Delta R1={}，Delta mAP={}。'.format(
             index, row['Variant'], fmt(float(row['Diff_R1'])), fmt(float(row['Diff_mAP']), 4),
             fmt(float(row['Delta_Diff_R1'])) if row['Delta_Diff_R1'] != '' else 'n/a',
             fmt(float(row['Delta_Diff_mAP'])) if row['Delta_Diff_mAP'] != '' else 'n/a'))
     report_lines += ['', '## 3-seed matched 结果', '',
-                     '见 [identity_preservation_multiseed.csv](identity_preservation_multiseed.csv) 和 per-seed 明细。所有 Delta 都是同 seed 的 `M_variant,s - M_N00,s`。', '']
+                     '见 [identity_preservation_multiseed.csv](identity_preservation_multiseed.csv) 和 per-seed 明细。所有 Delta 都是同 seed 的 `M_variant,s - M_N00,s`。', '',
+                     '| Variant | Reliability | Diff R1 mean±std | Diff mAP mean±std | Same R1 mean±std | Same mAP mean±std | matched ΔDiff R1 mean±std | matched ΔDiff mAP mean±std |',
+                     '|---|---|---:|---:|---:|---:|---:|---:|']
     for row in multiseed_rows:
         if row['n_seeds']:
-            report_lines.append('- `{}`：Diff R1 {}±{}，Diff mAP {}±{}；matched Delta R1 {}±{}，Delta mAP {}±{}。'.format(
-                row['Variant'], fmt(row['Diff_R1_mean']), fmt(row['Diff_R1_std']),
-                fmt(row['Diff_mAP_mean']), fmt(row['Diff_mAP_std']),
-                fmt(row['Delta_Diff_R1_mean']), fmt(row['Delta_Diff_R1_std']),
-                fmt(row['Delta_Diff_mAP_mean']), fmt(row['Delta_Diff_mAP_std'])))
+            report_lines.append('| `{}` | {} | {}±{} | {}±{} | {}±{} | {}±{} | {}±{} | {}±{} |'.format(
+                row['Variant'], row['Reliability'], show(row['Diff_R1_mean']), show(row['Diff_R1_std']),
+                show(row['Diff_mAP_mean']), show(row['Diff_mAP_std']),
+                show(row['Same_R1_mean']), show(row['Same_R1_std']),
+                show(row['Same_mAP_mean']), show(row['Same_mAP_std']),
+                show(row['Delta_Diff_R1_mean']), show(row['Delta_Diff_R1_std']),
+                show(row['Delta_Diff_mAP_mean']), show(row['Delta_Diff_mAP_std'])))
     report_lines += ['', '## Same Clothes 稳定性', '']
     for variant, mean, std in sorted(same_stability, key=lambda row: row[2]):
-        report_lines.append('- `{}`：Same R1 {}±{}。'.format(variant, fmt(mean), fmt(std)))
+        row = multiseed_by_variant.get(variant, {})
+        report_lines.append('- `{}`：Same R1 {}±{}，Same mAP {}±{}。'.format(
+            variant, show(mean), show(std), show(multiseed_number(variant, 'Same_mAP_mean')),
+            show(multiseed_number(variant, 'Same_mAP_std'))))
     report_lines += [
         '',
         '## Semantic cosine / margin diagnostics',
@@ -349,23 +447,53 @@ def main(args):
         '',
         '## 机制问题自动回答',
         '',
-        '- Q1 Raw alignment：比较 N01 vs N00；见 seed0 `Delta_*` 与 diagnostics。',
-        '- Q2 Residual preservation：比较 N02–N04 vs N01；看 R1/mAP 与 residual cosine 是否同步改善。',
-        '- Q3 Leakage exclusion：比较 N05–N07 vs N00；重点看 `cos_com_sem` 是否下降而 ReID 不受损。',
-        '- Q4 Relative ranking：比较 N08–N11；重点看 `semantic_margin` 是否为正且跨 seed 稳定。',
-        '- Q5 Preservation + exclusion：比较 N12/N13 与单机制组，检查是否互补。',
-        '- Q6 Reliability：只比较 N09/N14/N15/N16；使用 matched 3-seed Delta，不使用单 seed 最大值。',
-        '- Q7 Multi-seed：见 `identity_preservation_multiseed_per_seed.csv`，报告了每个 seed 对 N00 的匹配差值。',
+        '- Q1 Raw alignment：N01 相对 N00 为 Diff R1 {} pp、Diff mAP {} pp；结论：只有很小的 R1 单 seed 增益，mAP 基本 neutral/略降，不能认为 direct alignment 已有效。'.format(show(q1_r1), show(q1_map)),
+        '- Q2 Residual preservation：N02–N04 的最佳 Diff R1={}、Diff mAP={}，均未超过 N01 的 R1={}、mAP={}；结论：本轮三个 preservation 权重没有优于 raw alignment，虽 residual cosine/margin 随权重上升但未转化为 ReID 收益。'.format(show(q2_best_r1), show(q2_best_map), show(q2_raw_r1), show(q2_raw_map)),
+        '- Q3 Leakage exclusion：N05/N06/N07 的 seed0 Diff R1 Δ分别为 {}/{}/{} pp、mAP Δ分别为 {}/{}/{} pp；`cos_com_sem` 约在 {} 到 {}，没有随 lambda 单调下降；结论：低权重 N05 有小幅正向，但 exclusion 尚无稳定证据。'.format(
+            show(seed0_number('N05', 'Delta_Diff_R1')), show(seed0_number('N06', 'Delta_Diff_R1')), show(seed0_number('N07', 'Delta_Diff_R1')),
+            show(seed0_number('N05', 'Delta_Diff_mAP')), show(seed0_number('N06', 'Delta_Diff_mAP')), show(seed0_number('N07', 'Delta_Diff_mAP')),
+            show(min(seed0_number(v, 'cos_com_sem') for v in ('N05', 'N06', 'N07')), 6),
+            show(max(seed0_number(v, 'cos_com_sem') for v in ('N05', 'N06', 'N07')), 6)),
+        '- Q4 Relative ranking：N08/N09/N10/N11 的 seed0 Diff R1 Δ为 {}/{}/{}/{} pp，mAP Δ为 {}/{}/{}/{} pp；margin diagnostic 均为正但性能不随 lambda/margin 单调，N09 的 3-seed matched R1 为 {}±{} pp、mAP 为 {}±{} pp；结论：ranking 改变了 decomposition，但“更稳定”尚未被充分支持。'.format(
+            show(seed0_number('N08', 'Delta_Diff_R1')), show(seed0_number('N09', 'Delta_Diff_R1')), show(seed0_number('N10', 'Delta_Diff_R1')), show(seed0_number('N11', 'Delta_Diff_R1')),
+            show(seed0_number('N08', 'Delta_Diff_mAP')), show(seed0_number('N09', 'Delta_Diff_mAP')), show(seed0_number('N10', 'Delta_Diff_mAP')), show(seed0_number('N11', 'Delta_Diff_mAP')),
+            show(multiseed_number('N09', 'Delta_Diff_R1_mean')), show(multiseed_number('N09', 'Delta_Diff_R1_std')),
+            show(multiseed_number('N09', 'Delta_Diff_mAP_mean')), show(multiseed_number('N09', 'Delta_Diff_mAP_std'))),
+        '- Q5 Preservation + exclusion：N12 为 Diff R1 Δ={}、mAP Δ={}，N13 为 Diff R1 Δ={}、mAP Δ={}；结论：只有较高 exclusion 权重的 N13 显示弱的 seed0 互补迹象，N12 反而受损，不能确认普遍互补。'.format(
+            show(q5_n12_r1), show(q5_n12_map), show(q5_n13_r1), show(q5_n13_map)),
+        '- Q6 Reliability：matched 3-seed Delta Diff R1/mAP 分别为 N09={}/{}、N14={}/{}、N15={}/{}、N16={}/{} pp；结论：attribute/confidence 没有稳定额外收益，joint 的 mAP 为正且更稳定，但 R1 仍接近 neutral。'.format(
+            show(multiseed_number('N09', 'Delta_Diff_R1_mean')), show(multiseed_number('N09', 'Delta_Diff_mAP_mean')),
+            show(multiseed_number('N14', 'Delta_Diff_R1_mean')), show(multiseed_number('N14', 'Delta_Diff_mAP_mean')),
+            show(multiseed_number('N15', 'Delta_Diff_R1_mean')), show(multiseed_number('N15', 'Delta_Diff_mAP_mean')),
+            show(multiseed_number('N16', 'Delta_Diff_R1_mean')), show(multiseed_number('N16', 'Delta_Diff_mAP_mean'))),
+        '- Q7 Multi-seed：N16 joint 的 matched Diff mAP deltas 为 {}，三个 seed 均为正；Diff R1 deltas 为 {}，仅小幅正/负摆动；Same R1 为 {}±{} 且是五个关键配置中波动最小；结论：matched evidence 最支持 joint 用于 mAP/Same Clothes 稳定性，不支持明显 Diff R1 提升。详见 [identity_preservation_multiseed_per_seed.csv](identity_preservation_multiseed_per_seed.csv)。'.format(
+            ', '.join(show(x) for x in n16_map_deltas), ', '.join(show(x) for x in n16_r1_deltas),
+            show(multiseed_number('N16', 'Same_R1_mean')), show(multiseed_number('N16', 'Same_R1_std'))),
         '',
         '## 与旧 V0–V4 比较',
         '',
         '- 已知旧 Original PDF V0：Different Clothes R1=64.4087，mAP=62.1613。',
         '- 旧 V0–V4 CSV：{}。若存在，将在自动分类中作为旧 EOT additive family 的参考；否则不虚构缺失数字。'.format(old_path or '当前候选路径未找到'),
+        '',
+        '| Variant | Semantic | Attribute reliability | Confidence reliability | Diff R1 | Diff mAP | Same R1 | Same mAP |',
+        '|---|---|---|---|---:|---:|---:|---:|',
+    ] + old_table + [
+        '',
+        '- 旧单 seed 中最佳 Diff R1 为 V2={}，最佳 Diff mAP 为 V3={}；新 seed0 中 N09 的 Diff R1={}（比旧 V2 高 {} pp），但 Diff mAP={}（比旧 V3 低 {} pp）。这是单 seed 对比，不能替代 matched multi-seed 结论。'.format(
+            show(float(old_by_variant['V2']['Diff_R1'])) if old_by_variant.get('V2') else 'n/a',
+            show(float(old_by_variant['V3']['Diff_mAP'])) if old_by_variant.get('V3') else 'n/a',
+            show(seed0_number('N09', 'Diff_R1')),
+            show(seed0_number('N09', 'Diff_R1') - float(old_by_variant['V2']['Diff_R1'])) if old_by_variant.get('V2') else 'n/a',
+            show(seed0_number('N09', 'Diff_mAP')),
+            show(seed0_number('N09', 'Diff_mAP') - float(old_by_variant['V3']['Diff_mAP'])) if old_by_variant.get('V3') else 'n/a'),
         '- 新 V2 所有主结果统一为 epoch50 final；不能用各组 best test epoch 替换主结果。',
         '',
         '## 最终推荐',
         '',
-        '优先依据 matched multi-seed 的 Different Clothes R1、mAP 以及 Same Clothes 的标准差；如果 ReID 不升但 residual/com cosine 和 margin 按预期变化，应把它作为 decomposition 机制证据，而不是伪造性能收益。',
+        '- 配置推荐 1：`N09`（none + rank λ=0.05、margin=0.10）作为当前最强的 Diff R1 机制候选，但必须接受其 mAP 没有提升、matched R1 效应小于 seed std 的事实。',
+        '- 配置推荐 2：`N16`（joint + rank λ=0.05、margin=0.10）作为 reliability 候选；三个 matched seed 的 Diff mAP delta 全为正，且 Same R1 波动最小，但 Diff R1 基本 neutral。',
+        '- 最推荐下一步：冻结 `N16` 做更大 seed 数的确认，并按属性/样本记录 decomposition change；若目标只看 Different Clothes R1，则并行保留 `N09`，不要再做 test-adaptive lambda 搜索。若确认效应仍接近 seed variance，应转向重新设计四属性 semantic representation。',
+        '判断原则：如果 ReID 不升但 residual/com cosine 和 margin 按预期变化，应把它作为 decomposition 机制证据，而不是伪造性能收益。',
         '',
         '不成功实验、失败状态和未启动任务均保留在 status CSV、各 run 目录及 queue status 中。',
     ]
