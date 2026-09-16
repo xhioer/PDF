@@ -1,0 +1,6 @@
+{
+  "discovered_test_mask_root_not_used": "/tmp/rchrl_prcc/prcc/parsing/lip/test",
+  "new_parsing_model_deployed": false,
+  "reason": "No reliable PRCC TRAIN parsing cache found; discovered TRAIN mask count is 0",
+  "status": "skipped"
+}

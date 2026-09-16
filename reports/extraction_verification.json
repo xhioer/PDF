@@ -1,0 +1,67 @@
+{
+  "no_test_used": true,
+  "script_sha256": "cfa723f17a2f0332dbdbc3d3b02d1b3ad593a1ab8f50383c13778c648c16e2ab",
+  "seed_rows": [
+    {
+      "checkpoint_sha256": "cb728c47c9f532b965a71ff8d99b83ced16cf93dea0afb1750b89672d0550775",
+      "count": 17896,
+      "feature_dimension": 512,
+      "finite_sample_check": {
+        "layers_l2": true,
+        "layers_raw": true
+      },
+      "layers_shape": [
+        17896,
+        13,
+        512
+      ],
+      "manifest_path": "/data/projects/PDF-worktrees/pdf-representation-diagnosis/outputs/pdf_representation_diagnosis/seed0/extraction_manifest.json",
+      "sanity": {
+        "max_fvisual_vs_model_eval_image_only_error": 0.0,
+        "max_z12_vs_visual_output_error": 0.0
+      },
+      "seed": 0
+    },
+    {
+      "checkpoint_sha256": "0d23ee8802369217c0658b44fd418c4d7968d623047cddeb71b8280ee25eec43",
+      "count": 17896,
+      "feature_dimension": 512,
+      "finite_sample_check": {
+        "layers_l2": true,
+        "layers_raw": true
+      },
+      "layers_shape": [
+        17896,
+        13,
+        512
+      ],
+      "manifest_path": "/data/projects/PDF-worktrees/pdf-representation-diagnosis/outputs/pdf_representation_diagnosis/seed1/extraction_manifest.json",
+      "sanity": {
+        "max_fvisual_vs_model_eval_image_only_error": 0.0,
+        "max_z12_vs_visual_output_error": 0.0
+      },
+      "seed": 1
+    },
+    {
+      "checkpoint_sha256": "083cd935d4f0b8adcc0e6e9c838168be0e01d51dc251783a4e8147d66ba071d9",
+      "count": 17896,
+      "feature_dimension": 512,
+      "finite_sample_check": {
+        "layers_l2": true,
+        "layers_raw": true
+      },
+      "layers_shape": [
+        17896,
+        13,
+        512
+      ],
+      "manifest_path": "/data/projects/PDF-worktrees/pdf-representation-diagnosis/outputs/pdf_representation_diagnosis/seed2/extraction_manifest.json",
+      "sanity": {
+        "max_fvisual_vs_model_eval_image_only_error": 0.0,
+        "max_z12_vs_visual_output_error": 0.0
+      },
+      "seed": 2
+    }
+  ],
+  "status": "verified"
+}

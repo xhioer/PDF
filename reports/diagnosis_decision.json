@@ -1,0 +1,43 @@
+{
+  "H1_final_minus_early_cosine_by_seed": [
+    0.03642131151153005,
+    0.03223154239811754,
+    0.028689523213455526
+  ],
+  "H1_late_minus_early_cosine_by_seed": [
+    0.015804135212797443,
+    0.01475178418978318,
+    0.011967214643456625
+  ],
+  "H1_verdict": "MODERATE SUPPORT",
+  "H2_F_cloth_A_C_R1_by_seed": [
+    0.8296363362003923,
+    0.8282782556209446,
+    0.8281273577787838
+  ],
+  "H2_F_cloth_cross_clothes_AUC_by_seed": [
+    0.9734204459,
+    0.96896439865,
+    0.9726488416
+  ],
+  "H2_operational_rule": "strong if all three F_cloth diff-clothes AUC > 0.70; moderate if all three >= 0.55 and A/C R1 exceeds 1/150 chance",
+  "H2_verdict": "STRONG SUPPORT",
+  "alpha_best_by_seed": [
+    1.5,
+    1.25,
+    1.0
+  ],
+  "alpha_best_minus_1_R1_by_seed": [
+    0.00015089784216082425,
+    0.0003017956843217595,
+    0.0
+  ],
+  "alpha_best_minus_1_mAP_by_seed": [
+    0.0006152315330036906,
+    0.00043723992533339917,
+    0.0
+  ],
+  "next_method": "A. Separated Attention + Structure Preservation",
+  "over_suppression_rule": "best alpha < 1.0 and best-minus-alpha1 R1 >= 0.003 or mAP >= 0.002 in at least 2/3 seeds",
+  "over_suppression_signal": false
+}

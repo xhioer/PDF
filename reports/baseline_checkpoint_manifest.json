@@ -1,0 +1,63 @@
+{
+  "checkpoint_role": "R00 epoch50 final; best-test auxiliary is not selected",
+  "checkpoints": [
+    {
+      "best_test_diff_r1_auxiliary": 0.6435224386113463,
+      "best_test_epoch_auxiliary": 50,
+      "checkpoint_bytes": 615720793,
+      "checkpoint_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed0/R00_control/epoch50_final.pth",
+      "checkpoint_role": "primary epoch50 final",
+      "checkpoint_sha256": "cb728c47c9f532b965a71ff8d99b83ced16cf93dea0afb1750b89672d0550775",
+      "config": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nOUTPUT: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed0/R00_control\nSEED: 0\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+      "epoch": 50,
+      "provenance_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/outputs/crossclothes_relation_v1/seed0/R00_control/run_provenance.json",
+      "run_id": "R00",
+      "seed": 0,
+      "source_commit": "7c890687ce51b6290e577ea2ee1b3cdbf6421214",
+      "source_core_file_sha256": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+      "state_dict_key_count": 323,
+      "state_dict_key_sha256": "006f6fcb9567a94280cd247078e77a8b4c8ba52426643ab263c8d30012040ac3",
+      "training_seed": 0
+    },
+    {
+      "best_test_diff_r1_auxiliary": 0.6508608523849845,
+      "best_test_epoch_auxiliary": 45,
+      "checkpoint_bytes": 615720793,
+      "checkpoint_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed1/R00/epoch50_final.pth",
+      "checkpoint_role": "primary epoch50 final",
+      "checkpoint_sha256": "0d23ee8802369217c0658b44fd418c4d7968d623047cddeb71b8280ee25eec43",
+      "config": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nOUTPUT: /data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed1/R00\nSEED: 1\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+      "epoch": 50,
+      "provenance_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed1/R00/run_provenance.json",
+      "run_id": "R00",
+      "seed": 1,
+      "source_commit": "fe2eba095b5b1488d05aef723abe322ca83b867b",
+      "source_core_file_sha256": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+      "state_dict_key_count": 323,
+      "state_dict_key_sha256": "006f6fcb9567a94280cd247078e77a8b4c8ba52426643ab263c8d30012040ac3",
+      "training_seed": 1
+    },
+    {
+      "best_test_diff_r1_auxiliary": 0.6652554332486593,
+      "best_test_epoch_auxiliary": 50,
+      "checkpoint_bytes": 615720793,
+      "checkpoint_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed2/R00/epoch50_final.pth",
+      "checkpoint_role": "primary epoch50 final",
+      "checkpoint_sha256": "083cd935d4f0b8adcc0e6e9c838168be0e01d51dc251783a4e8147d66ba071d9",
+      "config": "AUG:\n  RC_PROB: 0.5\n  RE_PROB: 0.5\n  RF_PROB: 0.5\nDATA:\n  CAPTION_PATH: /data/projects/PDF-worktrees/pdf-crossclothes-relation-v1/data/captions/prcc.json\n  DATASET: prcc\n  HEIGHT: 384\n  NUM_INSTANCES: 8\n  NUM_WORKERS: 4\n  ROOT: /data/datasets/PRCC\n  TEST_BATCH: 64\n  TRAIN_BATCH: 64\n  WIDTH: 128\nEVAL_MODE: false\nGPU: '0'\nLOSS:\n  CAL: cal\n  CLA_LOSS: crossentropy\n  CLA_M: 0.0\n  CLA_S: 16.0\n  CLOTHES_CLA_LOSS: cosface\n  EPSILON: 0.1\n  MOMENTUM: 0.0\n  PAIR_LOSS: contrastive\n  PAIR_LOSS_WEIGHT: 0.0\n  PAIR_M: 0.3\n  PAIR_S: 16.0\nMODEL:\n  FEATURE_DIM: 4096\n  NAME: resnet50\n  POOLING:\n    NAME: maxavg\n    P: 3\n  RES4_STRIDE: 1\n  RESUME: ''\nOUTPUT: /data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed2/R00\nSEED: 2\nTAG: rchrl\nTEST:\n  EVAL_STEP: 5\n  START_EVAL: 0\nTRAIN:\n  AMP: true\n  LR_SCHEDULER:\n    DECAY_RATE: 0.1\n    STEPSIZE:\n    - 20\n    - 40\n  MAX_EPOCH: 50\n  OPTIMIZER:\n    LR: 3.5e-07\n    NAME: adam\n    WEIGHT_DECAY: 0.0005\n  START_EPOCH: 0\n  START_EPOCH_ADV: 25\n  START_EPOCH_CC: 25\n",
+      "epoch": 50,
+      "provenance_path": "/data/projects/PDF-worktrees/pdf-crossclothes-relation-confirm/outputs/crossclothes_relation_confirm/seed2/R00/run_provenance.json",
+      "run_id": "R00",
+      "seed": 2,
+      "source_commit": "fe2eba095b5b1488d05aef723abe322ca83b867b",
+      "source_core_file_sha256": "9b3a3489c929518677ce10ae9101c8ba0e31bc6c31f36a1348ffc34107ef5aa7",
+      "state_dict_key_count": 323,
+      "state_dict_key_sha256": "006f6fcb9567a94280cd247078e77a8b4c8ba52426643ab263c8d30012040ac3",
+      "training_seed": 2
+    }
+  ],
+  "created_utc": "2026-09-16T06:54:15Z",
+  "experiment": "PDF-RLOS-Diagnosis",
+  "source_worktree": "/data/projects/PDF-worktrees/pdf-representation-diagnosis",
+  "test_checkpoint_selection_used": false
+}
