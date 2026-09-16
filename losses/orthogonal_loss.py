@@ -19,7 +19,7 @@ class OrthogonalProjectionLoss(nn.Module):
         return on_diag + 0.005 * off_diag
 
     def forward(self, features, k, labels=None, clothes_ids=None):
-        device = (torch.device('cuda') if features.is_cuda else torch.device('cpu'))
+        device = features.device
 
         #  features are normalized
         features = F.normalize(features, p=2, dim=1)
@@ -29,6 +29,7 @@ class OrthogonalProjectionLoss(nn.Module):
         features = torch.cat(GatherLayer.apply(features), dim=0)
         k = torch.cat(GatherLayer.apply(k), dim=0)
         labels = torch.cat(GatherLayer.apply(labels), dim=0)
+        clothes_ids = torch.cat(GatherLayer.apply(clothes_ids), dim=0)
 
         labels = labels[:, None]  # extend dim
 
